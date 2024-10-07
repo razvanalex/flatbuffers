@@ -5,6 +5,7 @@ use \Google\FlatBuffers\Struct;
 use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
+use \Google\FlatBuffers\Constants;
 
 class HandFan extends Table
 {
@@ -15,7 +16,18 @@ class HandFan extends Table
     public static function getRootAsHandFan(ByteBuffer $bb)
     {
         $obj = new HandFan();
-        return ($obj->init($bb->getInt($bb->getPosition()) + $bb->getPosition(), $bb));
+        return $obj->init($bb->getInt($bb->getPosition()) + $bb->getPosition(), $bb);
+    }
+
+    /**
+     * @param ByteBuffer $bb
+     * @return HandFan
+     */
+    public static function getSizePrefixedRootAsHandFan(ByteBuffer $bb)
+    {
+        $obj = new HandFan();
+        $bb->setPosition($bb->getPosition() + Constants::SIZEOF_INT);
+        return $obj->init($bb->getInt($bb->getPosition()) + $bb->getPosition(), $bb);
     }
 
     public static function HandFanIdentifier()

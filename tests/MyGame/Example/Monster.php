@@ -7,6 +7,7 @@ use \Google\FlatBuffers\Struct;
 use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
+use \Google\FlatBuffers\Constants;
 
 /// an example documentation comment: "monster object"
 class Monster extends Table
@@ -18,7 +19,18 @@ class Monster extends Table
     public static function getRootAsMonster(ByteBuffer $bb)
     {
         $obj = new Monster();
-        return ($obj->init($bb->getInt($bb->getPosition()) + $bb->getPosition(), $bb));
+        return $obj->init($bb->getInt($bb->getPosition()) + $bb->getPosition(), $bb);
+    }
+
+    /**
+     * @param ByteBuffer $bb
+     * @return Monster
+     */
+    public static function getSizePrefixedRootAsMonster(ByteBuffer $bb)
+    {
+        $obj = new Monster();
+        $bb->setPosition($bb->getPosition() + Constants::SIZEOF_INT);
+        return $obj->init($bb->getInt($bb->getPosition()) + $bb->getPosition(), $bb);
     }
 
     public static function MonsterIdentifier()
@@ -125,7 +137,7 @@ class Monster extends Table
     }
 
     /**
-     * @returnint
+     * @return int
      */
     public function getTest($obj)
     {
@@ -134,7 +146,7 @@ class Monster extends Table
     }
 
     /**
-     * @returnVectorOffset
+     * @return VectorOffset
      */
     public function getTest4($j)
     {
@@ -174,7 +186,7 @@ class Monster extends Table
     /// an example documentation comment: this will end up in the generated code
     /// multiline too
     /**
-     * @returnVectorOffset
+     * @return VectorOffset
      */
     public function getTestarrayoftables($j)
     {
@@ -380,7 +392,7 @@ class Monster extends Table
     }
 
     /**
-     * @returnVectorOffset
+     * @return VectorOffset
      */
     public function getTestarrayofsortedstruct($j)
     {
@@ -426,7 +438,7 @@ class Monster extends Table
     }
 
     /**
-     * @returnVectorOffset
+     * @return VectorOffset
      */
     public function getTest5($j)
     {
@@ -490,7 +502,7 @@ class Monster extends Table
     }
 
     /**
-     * @returnVectorOffset
+     * @return VectorOffset
      */
     public function getVectorOfReferrables($j)
     {
@@ -537,7 +549,7 @@ class Monster extends Table
     }
 
     /**
-     * @returnVectorOffset
+     * @return VectorOffset
      */
     public function getVectorOfStrongReferrables($j)
     {
@@ -621,7 +633,7 @@ class Monster extends Table
     }
 
     /**
-     * @returnint
+     * @return int
      */
     public function getAnyUnique($obj)
     {
@@ -639,7 +651,7 @@ class Monster extends Table
     }
 
     /**
-     * @returnint
+     * @return int
      */
     public function getAnyAmbiguous($obj)
     {
@@ -711,7 +723,7 @@ class Monster extends Table
     }
 
     /**
-     * @returnVectorOffset
+     * @return VectorOffset
      */
     public function getScalarKeySortedTables($j)
     {
@@ -1997,5 +2009,10 @@ class Monster extends Table
     public static function finishMonsterBuffer(FlatBufferBuilder $builder, $offset)
     {
         $builder->finish($offset, "MONS");
+    }
+
+    public static function finishSizePrefixedMonsterBuffer(FlatBufferBuilder $builder, $offset)
+    {
+        $builder->finish($offset, "MONS", true);
     }
 }
