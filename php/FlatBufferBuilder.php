@@ -21,7 +21,7 @@
 
 namespace Google\FlatBuffers;
 
-final class FlatbufferBuilder
+final class FlatBufferBuilder
 {
     /**
      * Internal ByteBuffer for the FlatBuffer data.
