@@ -95,6 +95,24 @@ final class FlatBufferBuilder
         $this->bb = $this->newByteBuffer($initial_size);
     }
 
+    /**
+     * Clear the buffer.
+     */
+    public function clear()
+    {
+        $this->space = $this->bb->capacity();
+        $this->bb->setPosition($this->space);
+        $this->minalign = 1;
+        $this->vtable = null;
+        $this->vtable_in_use = 0;
+        $this->nested = false;
+        $this->object_start = null;
+        $this->vtables = array();
+        $this->num_vtables = 0;
+        $this->vector_num_elems = 0;
+        $this->force_defaults = false;
+    }
+
     /// @cond FLATBUFFERS_INTERNAL
     /**
      * create new bytebuffer
@@ -170,11 +188,7 @@ final class FlatBufferBuilder
 
         $nbb->setPosition($new_buf_size - $old_buf_size);
 
-        // TODO(chobie): is this little bit faster?
-        //$nbb->_buffer = substr_replace($nbb->_buffer, $bb->_buffer, $new_buf_size - $old_buf_size, strlen($bb->_buffer));
-        for ($i = $new_buf_size - $old_buf_size, $j = 0; $j < strlen($bb->_buffer); $i++, $j++) {
-            $nbb->_buffer[$i] = $bb->_buffer[$j];
-        }
+        $nbb->_buffer = substr_replace($nbb->_buffer, $bb->_buffer, $new_buf_size - $old_buf_size, strlen($bb->_buffer));
 
         return $nbb;
     }
@@ -717,14 +731,29 @@ final class FlatBufferBuilder
         if (!$this->is_utf8($s)) {
             throw new \InvalidArgumentException("string must be utf-8 encoded value.");
         }
+        $s_len = strlen($s);
 
         $this->notNested();
         $this->addByte(0); // null terminated
-        $this->startVector(1, strlen($s), 1);
-        $this->space -= strlen($s);
-        for ($i =  $this->space, $j = 0 ; $j < strlen($s) ; $i++, $j++) {
-            $this->bb->_buffer[$i] = $s[$j];
-        }
+        $this->startVector(1, $s_len, 1);
+        $this->space -= $s_len;
+        $this->bb->_buffer = substr_replace($this->bb->_buffer, $s, $this->space, $s_len);
+        return $this->endVector();
+    }
+
+    /**
+     * Add the `$data` in the buffer.
+     * @param string $s The bytes to add.
+     * @return int The offset in the buffer where the bytes starts.
+     */
+    public function createBytesVector($data)
+    {
+        $data_len = strlen($data);
+
+        $this->notNested();
+        $this->startVector(1, $data_len, 1);
+        $this->space -= $data_len;
+        $this->bb->_buffer = substr_replace($this->bb->_buffer, $data, $this->space, $data_len);
         return $this->endVector();
     }
 
