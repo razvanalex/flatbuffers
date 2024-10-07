@@ -561,7 +561,7 @@ for it. The builder will automatically resize the backing buffer when necessary.
 
     ```php
     // Construct a Builder with 1024 byte backing array.
-    $builder = new Google\FlatBuffers\FlatbufferBuilder(1024);
+    $builder = new Google\FlatBuffers\FlatBufferBuilder(1024);
     ```
 
 === "Python"

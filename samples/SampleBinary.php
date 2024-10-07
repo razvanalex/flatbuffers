@@ -34,7 +34,7 @@ function __autoload($class_name) {
 
 // Example how to use FlatBuffers to create and read binary buffers.
 function main() {
-  $builder = new Google\FlatBuffers\FlatbufferBuilder(0);
+  $builder = new Google\FlatBuffers\FlatBufferBuilder(0);
 
   // Create some weapons for our Monster using the `createWeapon()` helper function.
   $weapon_one = $builder->createString("Sword");
