@@ -353,9 +353,11 @@ class PhpGenerator : public BaseGenerator {
   // Get the value of a table's scalar.
   void GetScalarFieldOfTable(const FieldDef& field, std::string* code_ptr) {
     std::string& code = *code_ptr;
+    std::string optional = field.IsOptional() ? "?" : "";
 
     code += Indent + "/**\n";
-    code += Indent + " * @return " + GenTypeGet(field.value.type) + "\n";
+    code += Indent + " * @return " + optional + GenTypeBasic(field.value.type) +
+            "\n";
     code += Indent + " */\n";
     code += Indent + "public function " + namer_.Method("get", field) + "()\n";
     code += Indent + "{\n";
@@ -365,7 +367,7 @@ class PhpGenerator : public BaseGenerator {
     code += "$this->bb->";
     code += namer_.Method("get", GenTypeGet(field.value.type)) +
             "($o + $this->bb_pos)";
-    code += " : " + GenDefaultValue(field.value) + ";\n";
+    code += " : " + GenDefaultValue(field) + ";\n";
     code += Indent + "}\n\n";
   }
 
@@ -405,7 +407,7 @@ class PhpGenerator : public BaseGenerator {
     } else {
       code += "$this->__indirect($o + $this->bb_pos), $this->bb) : ";
     }
-    code += GenDefaultValue(field.value) + ";\n";
+    code += GenDefaultValue(field) + ";\n";
     code += Indent + "}\n\n";
   }
 
@@ -419,7 +421,7 @@ class PhpGenerator : public BaseGenerator {
             NumToString(field.value.offset) + ");\n";
     code += Indent + Indent;
     code += "return $o != 0 ? $this->__string($o + $this->bb_pos) : ";
-    code += GenDefaultValue(field.value) + ";\n";
+    code += GenDefaultValue(field) + ";\n";
     code += Indent + "}\n\n";
   }
 
@@ -519,13 +521,13 @@ class PhpGenerator : public BaseGenerator {
       code += Indent + Indent;
       code += "return $o != 0 ? $this->__string($this->__vector($o) + $j * ";
       code += NumToString(InlineSize(vectortype)) + ") : ";
-      code += GenDefaultValue(field.value) + ";\n";
+      code += GenDefaultValue(field) + ";\n";
     } else {
       code += Indent + Indent + "return $o != 0 ? $this->bb->";
       code += namer_.Method("get", GenTypeGet(field.value.type));
       code += "($this->__vector($o) + $j * ";
       code += NumToString(InlineSize(vectortype)) + ") : ";
-      code += GenDefaultValue(field.value) + ";\n";
+      code += GenDefaultValue(field) + ";\n";
     }
     code += Indent + "}\n\n";
   }
@@ -1014,7 +1016,13 @@ class PhpGenerator : public BaseGenerator {
     return ctypename[type.base_type];
   }
 
-  std::string GenDefaultValue(const Value& value) {
+  std::string GenDefaultValue(const FieldDef& field) {
+    if (field.IsScalarOptional()) {
+      return "null";
+    }
+
+    const auto& value = field.value;
+
     if (value.type.enum_def) {
       if (auto val = value.type.enum_def->FindByValue(value.constant)) {
         return WrapInNameSpace(*value.type.enum_def) + "::" + val->name;
