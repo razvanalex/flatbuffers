@@ -986,7 +986,7 @@ class PhpGenerator : public BaseGenerator {
                : (IsStruct(field.value.type) ? "Struct" : "Offset");
   }
 
-  std::string GenTypeBasic(const Type &type) {
+  std::string GenTypeBasic(const Type &type) const {
     // clang-format off
     static const char *ctypename[] = {
       #define FLATBUFFERS_TD(ENUM, IDLTYPE, \
@@ -1011,21 +1011,30 @@ class PhpGenerator : public BaseGenerator {
         return WrapInNameSpace(*value.type.enum_def) + "::" + val->name;
       }
     }
+    if (IsVector(value.type) || IsArray(value.type)) {
+      return GenDefaultValueBasic(value.type.element, value.constant);
+    }
+    return GenDefaultValueBasic(value.type.base_type, value.constant);
+  }
 
-    switch (value.type.base_type) {
-      case BASE_TYPE_BOOL: return value.constant == "0" ? "false" : "true";
+  std::string GenDefaultValueBasic(const BaseType &type,
+                                   const std::string &value_const) {
+    switch (type) {
+      case BASE_TYPE_BOOL: return value_const == "0" ? "false" : "true";
 
+      case BASE_TYPE_UNION:
+      case BASE_TYPE_STRUCT:
       case BASE_TYPE_STRING: return "null";
 
       case BASE_TYPE_LONG:
       case BASE_TYPE_ULONG:
-        if (value.constant != "0") {
-          int64_t constant = StringToInt(value.constant.c_str());
+        if (value_const != "0") {
+          int64_t constant = StringToInt(value_const.c_str());
           return NumToString(constant);
         }
         return "0";
 
-      default: return value.constant;
+      default: return value_const;
     }
   }
 
