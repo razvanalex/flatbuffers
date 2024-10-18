@@ -64,7 +64,7 @@ class Monster extends Table
     {
         $obj = new Vec3();
         $o = $this->__offset(4);
-        return $o != 0 ? $obj->init($o + $this->bb_pos, $this->bb) : 0;
+        return $o != 0 ? $obj->init($o + $this->bb_pos, $this->bb) : null;
     }
 
     /**
@@ -171,7 +171,7 @@ class Monster extends Table
     public function getTestarrayofstring($j)
     {
         $o = $this->__offset(24);
-        return $o != 0 ? $this->__string($this->__vector($o) + $j * 4) : 0;
+        return $o != 0 ? $this->__string($this->__vector($o) + $j * 4) : null;
     }
 
     /**
@@ -208,7 +208,7 @@ class Monster extends Table
     {
         $obj = new Monster();
         $o = $this->__offset(28);
-        return $o != 0 ? $obj->init($this->__indirect($o + $this->bb_pos), $this->bb) : 0;
+        return $o != 0 ? $obj->init($this->__indirect($o + $this->bb_pos), $this->bb) : null;
     }
 
     /**
@@ -242,7 +242,7 @@ class Monster extends Table
     {
         $obj = new Stat();
         $o = $this->__offset(32);
-        return $o != 0 ? $obj->init($this->__indirect($o + $this->bb_pos), $this->bb) : 0;
+        return $o != 0 ? $obj->init($this->__indirect($o + $this->bb_pos), $this->bb) : null;
     }
 
     /**
@@ -333,7 +333,7 @@ class Monster extends Table
     public function getTestarrayofbools($j)
     {
         $o = $this->__offset(52);
-        return $o != 0 ? $this->bb->getBool($this->__vector($o) + $j * 1) : 0;
+        return $o != 0 ? $this->bb->getBool($this->__vector($o) + $j * 1) : false;
     }
 
     /**
@@ -379,7 +379,7 @@ class Monster extends Table
     public function getTestarrayofstring2($j)
     {
         $o = $this->__offset(60);
-        return $o != 0 ? $this->__string($this->__vector($o) + $j * 4) : 0;
+        return $o != 0 ? $this->__string($this->__vector($o) + $j * 4) : null;
     }
 
     /**
@@ -498,7 +498,7 @@ class Monster extends Table
     {
         $obj = new InParentNamespace();
         $o = $this->__offset(72);
-        return $o != 0 ? $obj->init($this->__indirect($o + $this->bb_pos), $this->bb) : 0;
+        return $o != 0 ? $obj->init($this->__indirect($o + $this->bb_pos), $this->bb) : null;
     }
 
     /**
@@ -745,7 +745,7 @@ class Monster extends Table
     {
         $obj = new Test();
         $o = $this->__offset(106);
-        return $o != 0 ? $obj->init($o + $this->bb_pos, $this->bb) : 0;
+        return $o != 0 ? $obj->init($o + $this->bb_pos, $this->bb) : null;
     }
 
     /**
