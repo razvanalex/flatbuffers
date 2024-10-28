@@ -8,8 +8,28 @@ use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
 use \Google\FlatBuffers\Constants;
+use \Google\FlatBuffers\IUnpackableObject;
+use \Google\FlatBuffers\IGeneratedObject;
 
-class Monster extends Table
+class MonsterT implements IGeneratedObject
+{
+    public function __construct()
+    {
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        Monster::startMonster($builder);
+        $monster = Monster::endMonster($builder);
+        return $monster;
+    }
+}
+
+class Monster extends Table implements IUnpackableObject
 {
     /**
      * @param ByteBuffer $bb
@@ -65,7 +85,7 @@ class Monster extends Table
      */
     public static function startMonster(FlatBufferBuilder $builder)
     {
-        $builder->StartObject(0);
+        $builder->startObject(0);
     }
 
     /**
@@ -86,6 +106,23 @@ class Monster extends Table
     public static function endMonster(FlatBufferBuilder $builder)
     {
         $o = $builder->endObject();
+        return $o;
+    }
+
+    /**
+     * @param MonsterT $o
+     */
+    public function unPackTo(&$o)
+    {
+    }
+
+    /**
+     * @return MonsterT
+     */
+    public function unPack()
+    {
+        $o = new MonsterT();
+        $this->unPackTo($o);
         return $o;
     }
 }

@@ -8,8 +8,38 @@ use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
 use \Google\FlatBuffers\Constants;
+use \Google\FlatBuffers\IUnpackableObject;
+use \Google\FlatBuffers\IGeneratedObject;
 
-class TestSimpleTableWithEnum extends Table
+class TestSimpleTableWithEnumT implements IGeneratedObject
+{
+    /**
+     * @var byte $color
+     */
+    public $color;
+
+    /**
+     * @param byte $color
+     */
+    public function __construct($color = \MyGame\Example\Color::Green)
+    {
+        $this->color = $color;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        TestSimpleTableWithEnum::startTestSimpleTableWithEnum($builder);
+        TestSimpleTableWithEnum::addColor($builder, $this->color);
+        $testSimpleTableWithEnum = TestSimpleTableWithEnum::endTestSimpleTableWithEnum($builder);
+        return $testSimpleTableWithEnum;
+    }
+}
+
+class TestSimpleTableWithEnum extends Table implements IUnpackableObject
 {
     /**
      * @param ByteBuffer $bb
@@ -74,7 +104,7 @@ class TestSimpleTableWithEnum extends Table
      */
     public static function startTestSimpleTableWithEnum(FlatBufferBuilder $builder)
     {
-        $builder->StartObject(1);
+        $builder->startObject(1);
     }
 
     /**
@@ -96,7 +126,7 @@ class TestSimpleTableWithEnum extends Table
      */
     public static function addColor(FlatBufferBuilder $builder, $color)
     {
-        $builder->addByteX(0, $color, 2);
+        $builder->addByteX(0, $color, \MyGame\Example\Color::Green);
     }
 
     /**
@@ -106,6 +136,24 @@ class TestSimpleTableWithEnum extends Table
     public static function endTestSimpleTableWithEnum(FlatBufferBuilder $builder)
     {
         $o = $builder->endObject();
+        return $o;
+    }
+
+    /**
+     * @param TestSimpleTableWithEnumT $o
+     */
+    public function unPackTo(&$o)
+    {
+        $o->color = $this->getColor();
+    }
+
+    /**
+     * @return TestSimpleTableWithEnumT
+     */
+    public function unPack()
+    {
+        $o = new TestSimpleTableWithEnumT();
+        $this->unPackTo($o);
         return $o;
     }
 }

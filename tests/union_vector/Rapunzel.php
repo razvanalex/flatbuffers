@@ -6,8 +6,35 @@ use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
 use \Google\FlatBuffers\Constants;
+use \Google\FlatBuffers\IUnpackableObject;
+use \Google\FlatBuffers\IGeneratedObject;
 
-class Rapunzel extends Struct
+class RapunzelT implements IGeneratedObject
+{
+    /**
+     * @var int $hair_length
+     */
+    public $hair_length;
+
+    /**
+     * @param int $hair_length
+     */
+    public function __construct($hair_length = 0)
+    {
+        $this->hair_length = $hair_length;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        return Rapunzel::createRapunzel($builder, $this->hairLength);
+    }
+}
+
+class Rapunzel extends Struct implements IUnpackableObject
 {
     /**
      * @param int $_i offset
@@ -38,5 +65,23 @@ class Rapunzel extends Struct
         $builder->prep(4, 4);
         $builder->putInt($hairLength);
         return $builder->offset();
+    }
+
+    /**
+     * @param RapunzelT $o
+     */
+    public function unPackTo(&$o)
+    {
+        $o->hair_length = $this->GetHairLength();
+    }
+
+    /**
+     * @return RapunzelT
+     */
+    public function unPack()
+    {
+        $o = new RapunzelT();
+        $this->unPackTo($o);
+        return $o;
     }
 }

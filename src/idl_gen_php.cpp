@@ -24,6 +24,7 @@
 #include "flatbuffers/code_generators.h"
 #include "flatbuffers/flatbuffers.h"
 #include "flatbuffers/idl.h"
+#include "flatbuffers/reflection.h"
 #include "flatbuffers/util.h"
 
 namespace flatbuffers {
@@ -38,8 +39,8 @@ static Namer::Config PhpDefaultConfig() {
            /*variants=*/Case::kKeep,
            /*enum_variant_seperator=*/"::",
            /*escape_keywords=*/Namer::Config::Escape::BeforeConvertingCase,
-           /*namespaces=*/Case::kUnknown,
-           /*namespace_seperator=*/"_",
+           /*namespaces=*/Case::kKeep,
+           /*namespace_seperator=*/"\\",
            /*object_prefix=*/"",
            /*object_suffix=*/"T",
            /*keyword_prefix=*/"",
@@ -148,6 +149,7 @@ class PhpGenerator : public BaseGenerator {
   PhpGenerator(const Parser &parser, const std::string &path,
                const std::string &file_name)
       : BaseGenerator(parser, path, file_name, "\\", "\\", "php"),
+        float_const_gen_("NAN", "INF", "-INF"),
         namer_(WithFlagOptions(PhpDefaultConfig(), parser.opts, path),
                PhpKeywords()) {}
   bool generate() {
@@ -179,6 +181,713 @@ class PhpGenerator : public BaseGenerator {
     return true;
   }
 
+  void GenNativeUnpack(const StructDef &struct_def, std::string *code_ptr) {
+    if (struct_def.generated) return;
+
+    std::string &code = *code_ptr;
+    const std::string object_type = namer_.ObjectType(struct_def);
+
+    code += "\n";
+    code += Indent + "/**\n";
+    code += Indent + " * @param " + object_type + " $o\n";
+    code += Indent + " */\n";
+    code += Indent + "public function unPackTo(&$o)\n";
+    code += Indent + "{\n";
+
+    for (auto it = struct_def.fields.vec.begin();
+         it != struct_def.fields.vec.end(); ++it) {
+      auto &field = **it;
+      if (field.deprecated) continue;
+      if (IsScalar(field.value.type.base_type) && IsUnion(field.value.type))
+        continue;
+
+      const std::string field_field = namer_.Field(field);
+      const std::string field_var = namer_.Variable(field);
+      const std::string length_var = "$" + field_var + "Length";
+
+      switch (field.value.type.base_type) {
+        case BASE_TYPE_STRUCT: {
+          GenUnPackForStruct(struct_def, field, &code);
+          break;
+        }
+        case BASE_TYPE_UNION: {
+          GenUnPackForUnion(struct_def, field, &code);
+          break;
+        }
+        case BASE_TYPE_ARRAY:
+        case BASE_TYPE_VECTOR: {
+          auto vectortype = field.value.type.VectorType();
+          if (vectortype.base_type == BASE_TYPE_STRUCT) {
+            GenUnPackForStructVector(struct_def, field, &code);
+          } else if (vectortype.base_type == BASE_TYPE_UCHAR) {
+            GenUnPackForUBytesField(struct_def, field, &code);
+          } else {
+            GenUnPackForScalarVector(struct_def, field, &code);
+          }
+          break;
+        }
+        default: GenUnPackForScalarOrString(struct_def, field, &code);
+      }
+    }
+    code += Indent + "}\n";
+
+    code += "\n";
+    code += Indent + "/**\n";
+    code += Indent + " * @return " + object_type + "\n";
+    code += Indent + " */\n";
+    code += Indent + "public function unPack()\n";
+    code += Indent + "{\n";
+    code += Indent + Indent + "$o = new " + object_type + "();\n";
+    code += Indent + Indent + "$this->unPackTo($o);\n";
+    code += Indent + Indent + "return $o;\n";
+    code += Indent + "}\n";
+  }
+
+  void GenUnPackForStruct(const StructDef &struct_def, const FieldDef &field,
+                          std::string *code_ptr) const {
+    auto &code = *code_ptr;
+
+    const auto field_field = namer_.Field(field);
+    const auto field_var = "$" + field_field;
+    const auto field_obj = "$o->" + field_field;
+    const auto field_value = "$this->" + GetMethod(struct_def, field) + "()";
+
+    code += Indent + Indent + field_var + " = " + field_value + ";\n";
+    code += Indent + Indent + "if (" + field_var + " !== null) {\n";
+    code += Indent + Indent + Indent + field_obj + " = " + field_var +
+            "->unPack();\n";
+    code += Indent + Indent + "}\n";
+  }
+
+  void GenUnPackForUnion(const StructDef &struct_def, const FieldDef &field,
+                         std::string *code_ptr) const {
+    auto &code = *code_ptr;
+
+    const auto field_field = namer_.Field(field);
+    const auto field_type = namer_.Type(*field.value.type.enum_def);
+    const auto field_var = "$" + field_field;
+    const auto field_obj = "$o->" + field_field;
+    const auto accessor = GetMethod(struct_def, field);
+
+    code += Indent + Indent + field_var + " = $this->" + accessor + "Type();\n";
+    code += Indent + Indent + "if (" + field_var + " !== null) {\n";
+    code += Indent + Indent + Indent + field_obj + " = " + field_type +
+            "::unPack(" + field_var + ", array($this, '" + accessor + "'));\n";
+    code += Indent + Indent + "}\n";
+  }
+
+  void GenUnPackForStructVector(const StructDef &struct_def,
+                                const FieldDef &field,
+                                std::string *code_ptr) const {
+    auto &code = *code_ptr;
+
+    const auto field_field = namer_.Field(field);
+    const auto array_field_val = "$o->" + field_field;
+    const auto field_value_i =
+        "$this->" + GetMethod(struct_def, field) + "($i)";
+    const auto array_length = "$" + field_field + "_len";
+
+    code += Indent + Indent + array_field_val + " = array();\n";
+    code += Indent + Indent + array_length + " = $this->" +
+            namer_.Method("get", field, "Length") + "();\n";
+    code +=
+        Indent + Indent + "for ($i = 0; $i < " + array_length + "; $i++) {\n";
+    code += Indent + Indent + Indent + "array_push(" + array_field_val + ", " +
+            field_value_i + "->unpack());\n";
+    code += Indent + Indent + "}\n";
+  }
+
+  void GenUnPackForUBytesField(const StructDef &struct_def,
+                               const FieldDef &field,
+                               std::string *code_ptr) const {
+    auto &code = *code_ptr;
+
+    const auto array_field_val = "$o->" + namer_.Field(field);
+    const auto field_value =
+        "$this->" + GetMethod(struct_def, field) + "Bytes()";
+
+    code += Indent + Indent + array_field_val + " = " + field_value + ";\n";
+  }
+
+  void GenUnPackForScalarVector(const StructDef &struct_def,
+                                const FieldDef &field,
+                                std::string *code_ptr) const {
+    auto &code = *code_ptr;
+
+    const auto field_field = namer_.Field(field);
+    const auto array_field_val = "$o->" + field_field;
+    const auto field_value_i =
+        "$this->" + GetMethod(struct_def, field) + "($i)";
+    const auto array_length = "$" + field_field + "_len";
+
+    code += Indent + Indent + array_field_val + " = array();\n";
+    code += Indent + Indent + array_length + " = $this->" +
+            namer_.Method("get", field, "Length") + "();\n";
+    code +=
+        Indent + Indent + "for ($i = 0; $i < " + array_length + "; $i++) {\n";
+    code += Indent + Indent + Indent + "array_push(" + array_field_val + ", " +
+            field_value_i + ");\n";
+    code += Indent + Indent + "}\n";
+  }
+
+  void GenUnPackForScalarOrString(const StructDef &struct_def,
+                                  const FieldDef &field,
+                                  std::string *code_ptr) const {
+    auto &code = *code_ptr;
+
+    const auto field_field = namer_.Field(field);
+    const auto field_obj = "$o->" + field_field;
+    const auto field_value = "$this->" + GetMethod(struct_def, field) + "()";
+
+    code += Indent + Indent + field_obj + " = " + field_value + ";\n";
+  }
+
+  void GenNativeStruct(const StructDef &struct_def, std::string *code_ptr) {
+    if (struct_def.generated) return;
+
+    BeginClassForObjectAPI(struct_def, code_ptr);
+    GenConstructorForObjectAPI(struct_def, code_ptr);
+    if (!struct_def.fixed) {
+      GenPackForTable(struct_def, code_ptr);
+    } else {
+      GenPackForStruct(struct_def, code_ptr);
+    }
+    EndClass(code_ptr);
+
+    std::string &code = *code_ptr;
+    code += "\n";
+  }
+
+  void GenConstructorForObjectAPI(const StructDef &struct_def,
+                                  std::string *code_ptr) {
+    std::string &code = *code_ptr;
+    std::string fields = "";
+    std::string php_doc =
+        (struct_def.fields.vec.empty() ? "" : Indent + "/**\n");
+    std::string constructor_impl = Indent + "{\n";
+    std::string constructor_decl = Indent + "public function __construct(";
+    int num_args = 0;
+
+    for (auto it = struct_def.fields.vec.begin();
+         it != struct_def.fields.vec.end(); ++it) {
+      auto &field = **it;
+      if (field.deprecated) continue;
+      if (IsScalar(field.value.type.base_type) && IsUnion(field.value.type))
+        continue;
+
+      const auto field_field = namer_.Field(field);
+      const auto field_var = "$" + field_field;
+      const auto field_this = "$this->" + field_field;
+
+      std::string field_type;
+      if (IsStruct(field.value.type) || IsTable(field.value.type)) {
+        field_type = namer_.ObjectType(GenTypeGet(field.value.type));
+      } else if (IsUnion(field.value.type)) {
+        field_type = namer_.ObjectType(*field.value.type.enum_def);
+      } else if (IsArray(field.value.type) || IsVector(field.value.type)) {
+        field_type = "array";
+      } else {
+        field_type = GenTypeGet(field.value.type);
+      }
+
+      fields += Indent + "/**\n";
+      fields += Indent + " * @var " + field_type + " " + field_var + "\n";
+      fields += Indent + " */\n";
+      fields += Indent + "public " + field_var + ";\n\n";
+
+      php_doc += Indent + " * @param " + field_type + " " + field_var + "\n";
+      // FIXME: linter is dumb... reformat all on-line ifs...
+      if (num_args++ > 0) { constructor_decl += ", "; }
+
+      constructor_decl += field_var + " = ";
+      if (IsUnion(field.value.type)) {
+        constructor_decl += "null";
+      } else if (IsArray(field.value.type)) {
+        constructor_decl += "array()";
+      } else if (IsVector(field.value.type) && field.value.type.VectorType().base_type == BASE_TYPE_UCHAR) {
+        constructor_decl += "\"\"";
+      } else if (IsVector(field.value.type)) {
+        constructor_decl += "array()";
+      } else {
+        constructor_decl += GenDefaultValue(field);
+      }
+
+      constructor_impl +=
+          Indent + Indent + field_this + " = " + field_var + ";\n";
+    }
+
+    php_doc += struct_def.fields.vec.empty() ? "" : Indent + " */\n";
+    constructor_decl += ")\n";
+    constructor_impl += Indent + "}\n";
+
+    code += fields;
+    code += php_doc;
+    code += constructor_decl;
+    code += constructor_impl;
+    code += "\n";
+  }
+
+  void BeginClassForObjectAPI(const StructDef &struct_def,
+                              std::string *code_ptr) {
+    auto &code = *code_ptr;
+    code += "class " + namer_.ObjectType(struct_def) +
+            " implements IGeneratedObject\n";
+    code += "{\n";
+  }
+
+  void GenPackForStructField(const StructDef &struct_def, const FieldDef &field,
+                             std::string *code_prefix_ptr,
+                             std::string *code_ptr) const {
+    auto &code_prefix = *code_prefix_ptr;
+    auto &code = *code_ptr;
+    const auto field_field = namer_.Field(field);
+    const auto field_var = "$" + field_field;
+    const auto field_this = "$this->" + field_field;
+    const auto struct_type = namer_.Type(struct_def);
+    const auto add_field_method = namer_.Method("add", field);
+
+    if (field.value.type.struct_def->fixed) {
+      // Pure struct fields need to be created along with their parent
+      // structs.
+      code += Indent + Indent + "if (" + field_this + " !== null) {\n";
+      code += Indent + Indent + Indent + field_var + " = " + field_this +
+              "->pack($builder);\n";
+      code += Indent + Indent + Indent + struct_type + "::" + add_field_method +
+              "($builder, " + field_var + ");\n";
+      code += Indent + Indent + "}\n";
+    } else {
+      // Tables need to be created before their parent structs are created.
+      code_prefix += Indent + Indent + "if (" + field_this + " !== null) {\n";
+      code_prefix += Indent + Indent + Indent + field_var + " = " + field_this +
+                     "->pack($builder);\n";
+      code_prefix += Indent + Indent + "}\n";
+
+      code += Indent + Indent + "if (" + field_this + " !== null) {\n";
+      code += Indent + Indent + Indent + struct_type + "::" + add_field_method +
+              "($builder, " + field_var + ");\n";
+      code += Indent + Indent + "}\n";
+    }
+  }
+
+  void GenPackForUnionField(const StructDef &struct_def, const FieldDef &field,
+                            std::string *code_prefix_ptr,
+                            std::string *code_ptr) const {
+    auto &code_prefix = *code_prefix_ptr;
+    auto &code = *code_ptr;
+    const auto field_field = namer_.Field(field);
+    const auto field_var = "$" + field_field;
+    const auto field_this = "$this->" + field_field;
+    const auto add_field_method = namer_.Method("add", field);
+    const auto add_field_type_method =
+        namer_.Method("add", field.name + UnionTypeFieldSuffix());
+    const auto struct_type = namer_.Type(struct_def);
+
+    code_prefix += Indent + Indent + "if (" + field_this + " !== null && " +
+                   field_this + "->value !== null) {\n";
+    code_prefix += Indent + Indent + Indent + field_var + " = " + field_this +
+                   "->value->pack($builder);\n";
+    code_prefix += Indent + Indent + "}\n";
+
+    code += Indent + Indent + "if (" + field_this + " !== null && " +
+            field_this + "->type !== null) {\n";
+    code += Indent + Indent + Indent + struct_type +
+            "::" + add_field_type_method + "($builder, " + field_this +
+            "->type);\n";
+    code += Indent + Indent + Indent + struct_type + "::" + add_field_method +
+            "($builder, " + field_var + ");\n";
+    code += Indent + Indent + "}\n";
+  }
+
+  void GenPackForStructVectorField(const StructDef &struct_def,
+                                   const FieldDef &field,
+                                   std::string *code_prefix_ptr,
+                                   std::string *code_ptr) const {
+    auto &code_prefix = *code_prefix_ptr;
+    auto &code = *code_ptr;
+    const auto field_field = namer_.Field(field);
+    const auto field_var = "$" + field_field;
+    const auto field_arr = field_var + "_arr";
+    const auto field_this = "$this->" + field_field;
+    const auto struct_type = namer_.Type(struct_def);
+    const auto start_field_method = namer_.Method("start", field, "Vector");
+    const auto create_field_method = namer_.Method("create", field, "Vector");
+    const auto add_field_method = namer_.Method("add", field);
+
+    // Creates the field.
+    code_prefix += Indent + Indent + "if (" + field_this + " !== null) {\n";
+    if (field.value.type.struct_def->fixed) {
+      // FIXME(razvanalex): Need to check this
+      code_prefix += Indent + Indent + Indent;
+      code_prefix += struct_type + "::" + start_field_method +
+                     "($builder, count(" + field_this + "));\n";
+      code_prefix += Indent + Indent + Indent;
+      code_prefix +=
+          "for ($i = count(" + field_this + ") - 1; $i >= 0; $i--) {\n";
+      code_prefix += Indent + Indent + Indent + Indent;
+      code_prefix += field_this + "[$i]->pack($builder);\n";
+      code_prefix += Indent + Indent + Indent;
+      code_prefix += "}\n";
+      code_prefix += Indent + Indent + Indent;
+      code_prefix += field_var + " = $builder->endVector();\n";
+    } else {
+      // If the vector is a struct vector, we need to first build accessor for
+      // each struct element.
+      code_prefix += Indent + Indent + Indent;
+      code_prefix += field_arr + " = array();\n";
+      code_prefix += Indent + Indent + Indent;
+      code_prefix += "for ($i = 0; $i < count(" + field_this + "); $i++) {\n";
+      code_prefix += Indent + Indent + Indent + Indent;
+      code_prefix += "array_push(" + field_arr + ", " + field_this +
+                     "[i]->pack($builder));\n";
+      code_prefix += Indent + Indent + Indent;
+      code_prefix += "}\n";
+      code_prefix += Indent + Indent + Indent;
+      code_prefix += field_var + " = " + struct_type +
+                     "::" + create_field_method + "($builder, " + field_arr +
+                     ");\n";
+    }
+    code_prefix += Indent + Indent;
+    code_prefix += "}\n";
+
+    // Adds the field into the struct.
+    code += Indent + Indent;
+    code += "if (" + field_this + " !== null) {\n";
+    code += Indent + Indent + Indent;
+    code += struct_type + "::" + add_field_method + "($builder, " + field_var +
+            ");\n";
+    code += Indent + Indent + "}\n";
+  }
+
+  void GenPackForScalarVectorFieldHelper(const StructDef &struct_def,
+                                         const FieldDef &field,
+                                         std::string *code_ptr,
+                                         int indents) const {
+    auto &code = *code_ptr;
+    const auto field_field = namer_.Field(field);
+    const auto field_this = "$this->" + field_field;
+    const auto start_field_method = namer_.Method("start", field, "Vector");
+    const auto struct_type = namer_.Type(struct_def);
+    const auto vectortype = field.value.type.VectorType();
+    const auto indent_outter = std::string(indents * Indent.length(), ' ');
+    const auto indent_inner = std::string((indents + 1) * Indent.length(), ' ');
+
+    code += indent_outter + struct_type + "::" + start_field_method +
+            "($builder, count(" + field_this + "));\n";
+    code += indent_outter + "for ($i = count(" + field_this +
+            ") - 1; $i >= 0; $i--) {\n";
+
+    std::string type_name;
+    switch (vectortype.base_type) {
+      case BASE_TYPE_BOOL: type_name = "Bool"; break;
+      case BASE_TYPE_CHAR: type_name = "Sbyte"; break;
+      case BASE_TYPE_UTYPE:
+      case BASE_TYPE_UCHAR: type_name = "Byte"; break;
+      case BASE_TYPE_SHORT: type_name = "Shot"; break;
+      case BASE_TYPE_USHORT: type_name = "Ushort"; break;
+      case BASE_TYPE_INT: type_name = "Int"; break;
+      case BASE_TYPE_UINT: type_name = "Uint"; break;
+      case BASE_TYPE_LONG: type_name = "Long"; break;
+      case BASE_TYPE_ULONG: type_name = "Ulong"; break;
+      case BASE_TYPE_FLOAT: type_name = "Float"; break;
+      case BASE_TYPE_DOUBLE: type_name = "Double"; break;
+      default: type_name = "Offset"; break;
+    }
+
+    code += indent_inner + "$builder->" + namer_.Method("add", type_name);
+  }
+
+  void GenPackForUBytesField(const StructDef &struct_def, const FieldDef &field,
+                             std::string *code_prefix_ptr,
+                             std::string *code_ptr) const {
+    auto &code = *code_ptr;
+    auto &code_prefix = *code_prefix_ptr;
+    const auto field_field = namer_.Field(field);
+    const auto field_var = "$" + field_field;
+    const auto field_this = "$this->" + field_field;
+    const auto add_field_method = namer_.Method("add", field);
+    const auto struct_type = namer_.Type(struct_def);
+
+    code_prefix += Indent + Indent + "if (" + field_this + " !== null) {\n";
+    code_prefix += Indent + Indent + Indent + field_var +
+                   " = $builder->createBytesVector(" + field_this + ");\n";
+    code_prefix += Indent + Indent + "}\n";
+
+    code += Indent + Indent + "if (" + field_this + " !== null) {\n";
+    code += Indent + Indent + Indent;
+    code += struct_type + "::" + add_field_method + "($builder, " + field_var +
+            ");\n";
+    code += Indent + Indent + "}\n";
+  }
+
+  void GenPackForScalarVectorField(const StructDef &struct_def,
+                                   const FieldDef &field,
+                                   std::string *code_prefix_ptr,
+                                   std::string *code_ptr) const {
+    auto &code = *code_ptr;
+    auto &code_prefix = *code_prefix_ptr;
+    const auto field_field = namer_.Field(field);
+    const auto field_var = "$" + field_field;
+    const auto field_arr = field_var + "_arr";
+    const auto field_this = "$this->" + field_field;
+    const auto add_field_method = namer_.Method("add", field);
+    const auto create_field_method = namer_.Method("create", field, "Vector");
+    const auto struct_type = namer_.Type(struct_def);
+
+    // Adds the field into the struct.
+    code += Indent + Indent + "if (" + field_this + " !== null) {\n";
+    code += Indent + Indent + Indent;
+    code += struct_type + "::" + add_field_method + "($builder, " + field_var +
+            ");\n";
+    code += Indent + Indent + "}\n";
+
+    // Creates the field.
+    code_prefix += Indent + Indent + "if (" + field_this + " !== null) {\n";
+    // If the vector is a string vector, we need to first build accessor for
+    // each string element. And this generated code, needs to be
+    // placed ahead of code_prefix.
+    auto vectortype = field.value.type.VectorType();
+    if (IsString(vectortype)) {
+      code_prefix += Indent + Indent + Indent + field_arr + " = array();\n";
+      code_prefix += Indent + Indent + Indent + "for ($i = 0; $i < count(" +
+                     field_this + "); $i++) {\n";
+      code_prefix += Indent + Indent + Indent + Indent + "array_push(" +
+                     field_arr + ", $builder->createString(" + field_this +
+                     "[$i]));\n";
+      code_prefix += Indent + Indent + Indent + "}\n";
+      code_prefix += Indent + Indent + Indent + field_var + " = " +
+                     struct_type + "::" + create_field_method + "($builder, " +
+                     field_arr + ");\n";
+      code_prefix += Indent + Indent + "}\n";
+      return;
+    }
+
+    code_prefix += Indent + Indent + Indent + field_var + " = " + struct_type +
+                   "::" + create_field_method + "($builder, " + field_this +
+                   ");\n";
+    code_prefix += Indent + Indent + "}\n";
+  }
+
+  void GenPackForTable(const StructDef &struct_def, std::string *code_ptr) {
+    std::string &code_base = *code_ptr;
+    std::string code, code_prefix;
+    const auto struct_var = "$" + namer_.Variable(struct_def);
+    const auto struct_type = namer_.Type(struct_def);
+
+    code_base += Indent + "/**\n";
+    code_base += Indent + " * @param FlatBufferBuilder $builder\n";
+    code_base += Indent + " * @return int offset\n";
+    code_base += Indent + " */\n";
+    code_base += Indent + "public function pack(FlatBufferBuilder $builder)\n";
+    code_base += Indent + "{\n";
+
+    code += Indent + Indent + struct_type + "::start" + struct_type +
+            "($builder);\n";
+    for (auto it = struct_def.fields.vec.begin();
+         it != struct_def.fields.vec.end(); ++it) {
+      auto &field = **it;
+      if (field.deprecated) continue;
+      if (IsScalar(field.value.type.base_type) && IsUnion(field.value.type))
+        continue;
+
+      const auto add_field_method = namer_.Method("add", field);
+      const auto field_field = namer_.Field(field);
+      const auto field_var = "$" + field_field;
+      const auto field_this = "$this->" + field_field;
+
+      switch (field.value.type.base_type) {
+        case BASE_TYPE_STRUCT: {
+          GenPackForStructField(struct_def, field, &code_prefix, &code);
+          break;
+        }
+        case BASE_TYPE_UNION: {
+          GenPackForUnionField(struct_def, field, &code_prefix, &code);
+          break;
+        }
+        case BASE_TYPE_ARRAY:
+        case BASE_TYPE_VECTOR: {
+          auto vectortype = field.value.type.VectorType();
+          if (vectortype.base_type == BASE_TYPE_STRUCT) {
+            GenPackForStructVectorField(struct_def, field, &code_prefix, &code);
+          } else if (vectortype.base_type == BASE_TYPE_UCHAR) {
+            GenPackForUBytesField(struct_def, field, &code_prefix, &code);
+          } else {
+            GenPackForScalarVectorField(struct_def, field, &code_prefix, &code);
+          }
+          break;
+        }
+        case BASE_TYPE_STRING: {
+          code_prefix +=
+              Indent + Indent + "if (" + field_this + " !== null) {\n";
+          code_prefix += Indent + Indent + Indent + field_var +
+                         " = $builder->createString(" + field_this + ");\n";
+          code_prefix += Indent + Indent + "}\n";
+          code += Indent + Indent + "if (" + field_this + " !== null) {\n";
+          code += Indent + Indent + Indent + struct_type +
+                  "::" + add_field_method + "($builder, " + field_var + ");\n";
+          code += Indent + Indent + "}\n";
+          break;
+        }
+        default:
+          // Generates code for scalar values. If the value equals to the
+          // default value, builder will automatically ignore it. So we don't
+          // need to check the value ahead.
+          code += Indent + Indent + struct_type + "::" + add_field_method +
+                  "($builder, " + field_this + ");\n";
+          break;
+      }
+    }
+    code += Indent + Indent + struct_var + " = " + struct_type +
+            "::" + namer_.Method("end", struct_type) + "($builder);\n";
+    code += Indent + Indent + "return " + struct_var + ";\n";
+    code += Indent + "}\n";
+
+    code_base += code_prefix + code;
+  }
+
+  void GenPackForStruct(const StructDef &struct_def, std::string *code_ptr) {
+    std::string &code = *code_ptr;
+    const auto struct_fn = namer_.Function(struct_def);
+    const auto class_name = namer_.Type(struct_def);
+
+    code += Indent + "/**\n";
+    code += Indent + " * @param FlatBufferBuilder $builder\n";
+    code += Indent + " * @return int offset\n";
+    code += Indent + " */\n";
+    code += Indent + "public function pack(FlatBufferBuilder $builder)\n";
+    code += Indent + "{\n";
+    code += Indent + Indent + "return " + class_name + "::create" + struct_fn +
+            "($builder";
+    StructBuilderArgs(struct_def, "this->", "->", code_ptr);
+    code += ");\n";
+    code += Indent + "}\n";
+  }
+
+  void GenNativeUnion(const EnumDef &enum_def, std::string *code_ptr) {
+    std::string &code = *code_ptr;
+
+    GenNativeUnionClass(enum_def, code_ptr);
+    GenNativeUnionPack(enum_def, code_ptr);
+    EndClass(code_ptr);
+    code += "\n";
+  }
+
+  void GenNativeUnionClass(const EnumDef &enum_def, std::string *code_ptr) {
+    std::string &code = *code_ptr;
+    const std::string type = namer_.Type(enum_def);
+    const std::string union_type = namer_.ObjectType(enum_def);
+
+    code += "class " + union_type + "\n";
+    code += "{\n";
+    code += Indent + "/**\n";
+    code += Indent + " * @var " + type + " $type\n";
+    code += Indent + " */\n";
+    code += Indent + "public $type;\n";
+    code += "\n";
+    code += Indent + "/**\n";
+    code += Indent + " * @var mixed $value\n";
+    code += Indent + " */\n";
+    code += Indent + "public $value;\n";
+    code += "\n";
+    code += Indent + "/**\n";
+    code += Indent + " * @param " + type + " $type\n";
+    code += Indent + " * @param mixed $value\n";
+    code += Indent + " */\n";
+    code += Indent + "public function __construct($type, $value)\n";
+    code += Indent + "{\n";
+    code += Indent + Indent + "$this->type = $type;\n";
+    code += Indent + Indent + "$this->value = $value;\n";
+    code += Indent + "}\n";
+    code += "\n";
+  }
+
+  void GenNativeUnionPack(const EnumDef &enum_def, std::string *code_ptr) {
+    std::string &code = *code_ptr;
+    const std::string type = namer_.Type(enum_def);
+    const std::string union_type = namer_.ObjectType(enum_def);
+
+    code += Indent + "/**\n";
+    code += Indent + " * @param FlatBufferBuilder $builder\n";
+    code += Indent + " * @return int offset\n";
+    code += Indent + " */\n";
+    code += Indent + "public function pack(FlatBufferBuilder $builder)\n";
+    code += Indent + "{\n";
+    code += Indent + Indent + "switch ($this->type) {\n";
+    for (auto it2 = enum_def.Vals().begin(); it2 != enum_def.Vals().end();
+         ++it2) {
+      const EnumVal &ev = **it2;
+      if (ev.IsZero()) continue;
+      code += Indent + Indent + Indent + "case " +
+              namer_.EnumVariant(enum_def, ev) + ":\n";
+      if (ev.union_type.base_type == BASE_TYPE_STRUCT) {
+        code += Indent + Indent + Indent + Indent +
+                "return $this->value->pack($builder);\n";
+      } else {
+        code += Indent + Indent + Indent + Indent + "return $this->value" +
+                std::to_string(ev.union_type.base_type) + ";\n";
+      }
+    }
+    code += Indent + Indent + Indent + "default:\n";
+    code += Indent + Indent + Indent + Indent + "return 0;\n";
+    code += Indent + Indent + "}\n";
+    code += Indent + "}\n";
+  }
+
+  void GenNativeUnionUnPack(const EnumDef &enum_def, std::string *code_ptr) {
+    std::string &code = *code_ptr;
+    const std::string type = namer_.Type(enum_def);
+    const std::string union_type = namer_.ObjectType(enum_def);
+
+    code += "\n";
+    code += Indent + "/**\n";
+    code += Indent + " * @return " + union_type + "\n";
+    code += Indent + " */\n";
+    code += Indent + "public static function unPack($union_type, $accessor)\n";
+    code += Indent + "{\n";
+    code += Indent + Indent + "switch ($union_type) {\n";
+
+    for (auto it2 = enum_def.Vals().begin(); it2 != enum_def.Vals().end();
+         ++it2) {
+      const EnumVal &ev = **it2;
+      if (ev.IsZero()) continue;
+
+      const auto enum_variant = namer_.EnumVariant(enum_def, ev);
+
+      std::string enum_type;
+      switch (ev.union_type.base_type) {
+        case BASE_TYPE_STRUCT:
+          enum_type = "new " + ModuleFor(ev.union_type.struct_def) + "()";
+          break;
+        default: break;
+      }
+
+      code += Indent + Indent + Indent + "case " + enum_variant + ":\n";
+      code += Indent + Indent + Indent + Indent + "$obj = $accessor(" +
+              enum_type + ");\n";
+      code += Indent + Indent + Indent + Indent + "return new " + union_type +
+              "($union_type, $obj->unPack());\n";
+    }
+
+    code += Indent + Indent + Indent + "default:\n";
+    code += Indent + Indent + Indent + Indent + "return null;\n";
+    code += Indent + Indent + "}\n";
+    code += Indent + "}\n";
+  }
+
+  template<typename T> std::string ModuleFor(const T *def) const {
+    // TODO: cleanup this mess
+    if (!parser_.opts.one_file) { return "\\" + namer_.NamespacedType(*def); }
+
+    std::string filename =
+        StripExtension(def->file) + parser_.opts.filename_suffix;
+    if (parser_.file_being_parsed_ == def->file) {
+      return "\\" + StripPath(filename);  // make it a "local" import
+    }
+
+    std::string module = parser_.opts.include_prefix + filename;
+    std::replace(module.begin(), module.end(), '/', '\\');
+    return "\\" + module;
+  }
+
   // Begin by declaring namespace and imports.
   void BeginFile(const std::string &name_space_name, const bool needs_imports,
                  std::string *code_ptr) {
@@ -196,6 +905,8 @@ class PhpGenerator : public BaseGenerator {
       code += "use \\Google\\FlatBuffers\\ByteBuffer;\n";
       code += "use \\Google\\FlatBuffers\\FlatBufferBuilder;\n";
       code += "use \\Google\\FlatBuffers\\Constants;\n";
+      code += "use \\Google\\FlatBuffers\\IUnpackableObject;\n";
+      code += "use \\Google\\FlatBuffers\\IGeneratedObject;\n";
       code += "\n";
     }
   }
@@ -219,11 +930,14 @@ class PhpGenerator : public BaseGenerator {
   void BeginClass(const StructDef &struct_def, std::string *code_ptr) {
     std::string &code = *code_ptr;
     if (struct_def.fixed) {
-      code += "class " + namer_.Type(struct_def) + " extends Struct\n";
+      code += "class " + namer_.Type(struct_def) + " extends Struct";
     } else {
-      code += "class " + namer_.Type(struct_def) + " extends Table\n";
+      code += "class " + namer_.Type(struct_def) + " extends Table";
     }
-    code += "{\n";
+    if (parser_.opts.generate_object_based_api) {
+      code += " implements IUnpackableObject";
+    }
+    code += "\n{\n";
   }
 
   void EndClass(std::string *code_ptr) {
@@ -397,7 +1111,8 @@ class PhpGenerator : public BaseGenerator {
     code += Indent + "public function " + namer_.Method("get", field.name);
     code += "()\n";
     code += Indent + "{\n";
-    code += Indent + Indent + "$obj = new " + ScalarType(field) + "();\n";
+    code += Indent + Indent + "$obj = new " +
+            ModuleFor(field.value.type.struct_def) + "();\n";
     code += Indent + Indent + "$o = $this->__offset(" +
             NumToString(field.value.offset) + ");\n";
     code += Indent + Indent;
@@ -430,7 +1145,7 @@ class PhpGenerator : public BaseGenerator {
     std::string &code = *code_ptr;
 
     code += Indent + "/**\n";
-    code += Indent + " * @return" + GenTypeBasic(field.value.type) + "\n";
+    code += Indent + " * @return " + GenTypeBasic(field.value.type) + "\n";
     code += Indent + " */\n";
     code +=
         Indent + "public function " + namer_.Method("get", field) + "($obj)\n";
@@ -449,7 +1164,7 @@ class PhpGenerator : public BaseGenerator {
     auto vectortype = field.value.type.VectorType();
 
     code += Indent + "/**\n";
-    code += Indent + " * @return" + GenTypeBasic(field.value.type) + "\n";
+    code += Indent + " * @return " + GenTypeBasic(field.value.type) + "\n";
     code += Indent + " */\n";
     code +=
         Indent + "public function " + namer_.Method("get", field) + "($j)\n";
@@ -505,7 +1220,6 @@ class PhpGenerator : public BaseGenerator {
                                     std::string *code_ptr) {
     std::string &code = *code_ptr;
     auto vectortype = field.value.type.VectorType();
-
     code += Indent + "/**\n";
     code += Indent + " * @param int offset\n";
     code += Indent + " * @return " + GenTypeGet(field.value.type) + "\n";
@@ -555,7 +1269,7 @@ class PhpGenerator : public BaseGenerator {
   // Recursively generate arguments for a constructor, to deal with nested
   // structs.
   void StructBuilderArgs(const StructDef &struct_def, const char *nameprefix,
-                         std::string *code_ptr) {
+                         const char *separator, std::string *code_ptr) {
     for (auto it = struct_def.fields.vec.begin();
          it != struct_def.fields.vec.end(); ++it) {
       auto &field = **it;
@@ -565,7 +1279,8 @@ class PhpGenerator : public BaseGenerator {
         // these arguments are constructing
         // a nested struct, prefix the name with the field name.
         StructBuilderArgs(*field.value.type.struct_def,
-                          (nameprefix + (field.name + "_")).c_str(), code_ptr);
+                          (nameprefix + (field.name + separator)).c_str(),
+                          separator, code_ptr);
       } else {
         std::string &code = *code_ptr;
         code += std::string(", $") + nameprefix;
@@ -612,7 +1327,7 @@ class PhpGenerator : public BaseGenerator {
             namer_.LegacyPhpMethod("start", struct_def) +
             "(FlatBufferBuilder $builder)\n";
     code += Indent + "{\n";
-    code += Indent + Indent + "$builder->StartObject(";
+    code += Indent + Indent + "$builder->startObject(";
     code += NumToString(struct_def.fields.vec.size());
     code += ");\n";
     code += Indent + "}\n\n";
@@ -681,12 +1396,8 @@ class PhpGenerator : public BaseGenerator {
 
     code += "$" + namer_.Variable(field);
     code += ", ";
+    code += GenDefaultValue(field);
 
-    if (field.value.type.base_type == BASE_TYPE_BOOL) {
-      code += "false";
-    } else {
-      code += field.value.constant;
-    }
     code += ");\n";
     code += Indent + "}\n\n";
   }
@@ -872,6 +1583,9 @@ class PhpGenerator : public BaseGenerator {
   void GenStruct(const StructDef &struct_def, std::string *code_ptr) {
     if (struct_def.generated) return;
 
+    if (parser_.opts.generate_object_based_api) {
+      GenNativeStruct(struct_def, code_ptr);
+    }
     GenComment(struct_def.doc_comment, code_ptr, nullptr);
     BeginClass(struct_def, code_ptr);
 
@@ -933,12 +1647,23 @@ class PhpGenerator : public BaseGenerator {
       // Create a set of functions that allow table construction.
       GenTableBuilders(struct_def, code_ptr);
     }
+    if (parser_.opts.generate_object_based_api) {
+      GenNativeUnpack(struct_def, code_ptr);
+    }
     EndClass(code_ptr);
   }
 
   // Generate enum declarations.
   void GenEnum(const EnumDef &enum_def, std::string *code_ptr) {
     if (enum_def.generated) return;
+
+    std::string &code = *code_ptr;
+
+    if (enum_def.is_union && parser_.opts.generate_object_based_api) {
+      code += "use \\Google\\FlatBuffers\\FlatBufferBuilder;\n";
+      code += "\n";
+      GenNativeUnion(enum_def, code_ptr);
+    }
 
     GenComment(enum_def.doc_comment, code_ptr, nullptr);
     BeginEnum(enum_def.name, code_ptr);
@@ -948,7 +1673,6 @@ class PhpGenerator : public BaseGenerator {
       EnumMember(enum_def, ev, code_ptr);
     }
 
-    std::string &code = *code_ptr;
     code += "\n";
     code += Indent + "private static $names = array(\n";
     for (auto it = enum_def.Vals().begin(); it != enum_def.Vals().end(); ++it) {
@@ -965,11 +1689,15 @@ class PhpGenerator : public BaseGenerator {
     code += Indent + Indent + "}\n";
     code += Indent + Indent + "return self::$names[$e];\n";
     code += Indent + "}\n";
+
+    if (enum_def.is_union && parser_.opts.generate_object_based_api) {
+      GenNativeUnionUnPack(enum_def, code_ptr);
+    }
     EndEnum(code_ptr);
   }
 
   // Returns the function name that is able to read a value of the given type.
-  std::string GenGetter(const Type &type) {
+  std::string GenGetter(const Type &type) const {
     switch (type.base_type) {
       case BASE_TYPE_STRING: return "__string";
       case BASE_TYPE_STRUCT: return "__struct";
@@ -1000,9 +1728,7 @@ class PhpGenerator : public BaseGenerator {
   }
 
   std::string GenDefaultValue(const FieldDef &field) {
-    if (field.IsScalarOptional()) {
-      return "null";
-    }
+    if (field.IsScalarOptional()) { return "null"; }
 
     const auto &value = field.value;
 
@@ -1012,29 +1738,37 @@ class PhpGenerator : public BaseGenerator {
       }
     }
     if (IsVector(value.type) || IsArray(value.type)) {
-      return GenDefaultValueBasic(value.type.element, value.constant);
+      return GenDefaultValueBasic(field);
     }
-    return GenDefaultValueBasic(value.type.base_type, value.constant);
+    return GenDefaultValueBasic(field);
   }
 
-  std::string GenDefaultValueBasic(const BaseType &type,
-                                   const std::string &value_const) {
-    switch (type) {
-      case BASE_TYPE_BOOL: return value_const == "0" ? "false" : "true";
+  std::string GenDefaultValueBasic(const FieldDef &field) {
+    switch (field.value.type.base_type) {
+      case BASE_TYPE_BOOL:
+        return field.value.constant == "0" ? "false" : "true";
+
+      case BASE_TYPE_VECTOR:
+      case BASE_TYPE_ARRAY: return "array()";
 
       case BASE_TYPE_UNION:
       case BASE_TYPE_STRUCT:
       case BASE_TYPE_STRING: return "null";
 
+      case BASE_TYPE_FLOAT:
+      case BASE_TYPE_DOUBLE: {
+        return float_const_gen_.GenFloatConstant(field);
+      }
+
       case BASE_TYPE_LONG:
       case BASE_TYPE_ULONG:
-        if (value_const != "0") {
-          int64_t constant = StringToInt(value_const.c_str());
+        if (field.value.constant != "0") {
+          int64_t constant = StringToInt(field.value.constant.c_str());
           return NumToString(constant);
         }
         return "0";
 
-      default: return value_const;
+      default: return field.value.constant;
     }
   }
 
@@ -1053,6 +1787,13 @@ class PhpGenerator : public BaseGenerator {
     return IsScalar(type.base_type) ? GenTypeBasic(type) : GenTypePointer(type);
   }
 
+  std::string GetMethod(const StructDef &struct_def,
+                        const FieldDef &field) const {
+    return field.IsScalar() && struct_def.fixed
+               ? namer_.LegacyPhpField(GenGetter(field.value.type), field)
+               : namer_.Method("get", field);
+  }
+
   // Create a struct with a builder and the struct's arguments.
   void GenStructBuilder(const StructDef &struct_def, std::string *code_ptr) {
     std::string &code = *code_ptr;
@@ -1063,7 +1804,7 @@ class PhpGenerator : public BaseGenerator {
     code += Indent + "public static function " +
             namer_.LegacyPhpMethod("create", struct_def);
     code += "(FlatBufferBuilder $builder";
-    StructBuilderArgs(struct_def, "", code_ptr);
+    StructBuilderArgs(struct_def, "", "_", code_ptr);
     code += ")\n";
     code += Indent + "{\n";
 
@@ -1077,6 +1818,7 @@ class PhpGenerator : public BaseGenerator {
     return ConvertCase(GenTypeGet(field.value.type), Case::kUpperCamel);
   }
 
+  SimpleFloatConstantGenerator float_const_gen_;
   IdlNamer namer_;
 };
 }  // namespace php

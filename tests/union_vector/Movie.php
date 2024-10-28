@@ -6,8 +6,70 @@ use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
 use \Google\FlatBuffers\Constants;
+use \Google\FlatBuffers\IUnpackableObject;
+use \Google\FlatBuffers\IGeneratedObject;
 
-class Movie extends Table
+class MovieT implements IGeneratedObject
+{
+    /**
+     * @var CharacterT $main_character
+     */
+    public $main_character;
+
+    /**
+     * @var CharacterT $characters_type
+     */
+    public $characters_type;
+
+    /**
+     * @var CharacterT $characters
+     */
+    public $characters;
+
+    /**
+     * @param CharacterT $main_character
+     * @param CharacterT $characters_type
+     * @param CharacterT $characters
+     */
+    public function __construct($main_character = null, $characters_type = null, $characters = null)
+    {
+        $this->main_character = $main_character;
+        $this->characters_type = $characters_type;
+        $this->characters = $characters;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        if ($this->main_character !== null && $this->main_character->value !== null) {
+            $main_character = $this->main_character->value->pack($builder);
+        }
+        if ($this->characters_type !== null) {
+            $characters_type = Movie::createCharactersTypeVector($builder, $this->characters_type);
+        }
+        if ($this->characters !== null) {
+            $characters = Movie::createCharactersVector($builder, $this->characters);
+        }
+        Movie::startMovie($builder);
+        if ($this->main_character !== null && $this->main_character->type !== null) {
+            Movie::addMainCharacterType($builder, $this->main_character->type);
+            Movie::addMainCharacter($builder, $main_character);
+        }
+        if ($this->characters_type !== null) {
+            Movie::addCharactersType($builder, $characters_type);
+        }
+        if ($this->characters !== null) {
+            Movie::addCharacters($builder, $characters);
+        }
+        $movie = Movie::endMovie($builder);
+        return $movie;
+    }
+}
+
+class Movie extends Table implements IUnpackableObject
 {
     /**
      * @param ByteBuffer $bb
@@ -62,7 +124,7 @@ class Movie extends Table
     }
 
     /**
-     * @returnint
+     * @return int
      */
     public function getMainCharacter($obj)
     {
@@ -114,7 +176,7 @@ class Movie extends Table
      */
     public static function startMovie(FlatBufferBuilder $builder)
     {
-        $builder->StartObject(4);
+        $builder->startObject(4);
     }
 
     /**
@@ -139,7 +201,7 @@ class Movie extends Table
      */
     public static function addMainCharacterType(FlatBufferBuilder $builder, $mainCharacterType)
     {
-        $builder->addByteX(0, $mainCharacterType, 0);
+        $builder->addByteX(0, $mainCharacterType, \Character::NONE);
     }
 
     public static function addMainCharacter(FlatBufferBuilder $builder, $offset)
@@ -154,7 +216,7 @@ class Movie extends Table
      */
     public static function addCharactersType(FlatBufferBuilder $builder, $charactersType)
     {
-        $builder->addOffsetX(2, $charactersType, 0);
+        $builder->addOffsetX(2, $charactersType, \Character::NONE);
     }
 
     /**
@@ -188,7 +250,7 @@ class Movie extends Table
      */
     public static function addCharacters(FlatBufferBuilder $builder, $characters)
     {
-        $builder->addOffsetX(3, $characters, 0);
+        $builder->addOffsetX(3, $characters, \Character::NONE);
     }
 
     /**
@@ -233,5 +295,36 @@ class Movie extends Table
     public static function finishSizePrefixedMovieBuffer(FlatBufferBuilder $builder, $offset)
     {
         $builder->finish($offset, "MOVI", true);
+    }
+
+    /**
+     * @param MovieT $o
+     */
+    public function unPackTo(&$o)
+    {
+        $main_character = $this->getMainCharacterType();
+        if ($main_character !== null) {
+            $o->main_character = Character::unPack($main_character, array($this, 'getMainCharacter'));
+        }
+        $o->characters_type = array();
+        $characters_type_len = $this->getCharactersTypeLength();
+        for ($i = 0; $i < $characters_type_len; $i++) {
+            array_push($o->characters_type, $this->getCharactersType($i));
+        }
+        $o->characters = array();
+        $characters_len = $this->getCharactersLength();
+        for ($i = 0; $i < $characters_len; $i++) {
+            array_push($o->characters, $this->getCharacters($i));
+        }
+    }
+
+    /**
+     * @return MovieT
+     */
+    public function unPack()
+    {
+        $o = new MovieT();
+        $this->unPackTo($o);
+        return $o;
     }
 }
