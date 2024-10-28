@@ -6,8 +6,38 @@ use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
 use \Google\FlatBuffers\Constants;
+use \Google\FlatBuffers\IUnpackableObject;
+use \Google\FlatBuffers\IGeneratedObject;
 
-class HandFan extends Table
+class HandFanT implements IGeneratedObject
+{
+    /**
+     * @var int $length
+     */
+    public $length;
+
+    /**
+     * @param int $length
+     */
+    public function __construct($length = 0)
+    {
+        $this->length = $length;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        HandFan::startHandFan($builder);
+        HandFan::addLength($builder, $this->length);
+        $handFan = HandFan::endHandFan($builder);
+        return $handFan;
+    }
+}
+
+class HandFan extends Table implements IUnpackableObject
 {
     /**
      * @param ByteBuffer $bb
@@ -67,7 +97,7 @@ class HandFan extends Table
      */
     public static function startHandFan(FlatBufferBuilder $builder)
     {
-        $builder->StartObject(1);
+        $builder->startObject(1);
     }
 
     /**
@@ -99,6 +129,24 @@ class HandFan extends Table
     public static function endHandFan(FlatBufferBuilder $builder)
     {
         $o = $builder->endObject();
+        return $o;
+    }
+
+    /**
+     * @param HandFanT $o
+     */
+    public function unPackTo(&$o)
+    {
+        $o->length = $this->getLength();
+    }
+
+    /**
+     * @return HandFanT
+     */
+    public function unPack()
+    {
+        $o = new HandFanT();
+        $this->unPackTo($o);
         return $o;
     }
 }

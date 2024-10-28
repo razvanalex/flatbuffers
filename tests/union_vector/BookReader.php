@@ -6,8 +6,35 @@ use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
 use \Google\FlatBuffers\Constants;
+use \Google\FlatBuffers\IUnpackableObject;
+use \Google\FlatBuffers\IGeneratedObject;
 
-class BookReader extends Struct
+class BookReaderT implements IGeneratedObject
+{
+    /**
+     * @var int $books_read
+     */
+    public $books_read;
+
+    /**
+     * @param int $books_read
+     */
+    public function __construct($books_read = 0)
+    {
+        $this->books_read = $books_read;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        return BookReader::createBookReader($builder, $this->booksRead);
+    }
+}
+
+class BookReader extends Struct implements IUnpackableObject
 {
     /**
      * @param int $_i offset
@@ -38,5 +65,23 @@ class BookReader extends Struct
         $builder->prep(4, 4);
         $builder->putInt($booksRead);
         return $builder->offset();
+    }
+
+    /**
+     * @param BookReaderT $o
+     */
+    public function unPackTo(&$o)
+    {
+        $o->books_read = $this->GetBooksRead();
+    }
+
+    /**
+     * @return BookReaderT
+     */
+    public function unPack()
+    {
+        $o = new BookReaderT();
+        $this->unPackTo($o);
+        return $o;
     }
 }

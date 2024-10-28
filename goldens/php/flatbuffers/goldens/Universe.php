@@ -8,6 +8,8 @@ use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
 use \Google\FlatBuffers\Constants;
+use \Google\FlatBuffers\IUnpackableObject;
+use \Google\FlatBuffers\IGeneratedObject;
 
 class Universe extends Table
 {
@@ -78,7 +80,7 @@ class Universe extends Table
      */
     public static function startUniverse(FlatBufferBuilder $builder)
     {
-        $builder->StartObject(2);
+        $builder->startObject(2);
     }
 
     /**
@@ -111,7 +113,7 @@ class Universe extends Table
      */
     public static function addGalaxies(FlatBufferBuilder $builder, $galaxies)
     {
-        $builder->addOffsetX(1, $galaxies, 0);
+        $builder->addOffsetX(1, $galaxies, array());
     }
 
     /**

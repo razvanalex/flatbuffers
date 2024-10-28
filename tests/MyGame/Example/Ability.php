@@ -8,8 +8,42 @@ use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
 use \Google\FlatBuffers\Constants;
+use \Google\FlatBuffers\IUnpackableObject;
+use \Google\FlatBuffers\IGeneratedObject;
 
-class Ability extends Struct
+class AbilityT implements IGeneratedObject
+{
+    /**
+     * @var uint $id
+     */
+    public $id;
+
+    /**
+     * @var uint $distance
+     */
+    public $distance;
+
+    /**
+     * @param uint $id
+     * @param uint $distance
+     */
+    public function __construct($id = 0, $distance = 0)
+    {
+        $this->id = $id;
+        $this->distance = $distance;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        return Ability::createAbility($builder, $this->id, $this->distance);
+    }
+}
+
+class Ability extends Struct implements IUnpackableObject
 {
     /**
      * @param int $_i offset
@@ -49,5 +83,24 @@ class Ability extends Struct
         $builder->putUint($distance);
         $builder->putUint($id);
         return $builder->offset();
+    }
+
+    /**
+     * @param AbilityT $o
+     */
+    public function unPackTo(&$o)
+    {
+        $o->id = $this->GetId();
+        $o->distance = $this->GetDistance();
+    }
+
+    /**
+     * @return AbilityT
+     */
+    public function unPack()
+    {
+        $o = new AbilityT();
+        $this->unPackTo($o);
+        return $o;
     }
 }

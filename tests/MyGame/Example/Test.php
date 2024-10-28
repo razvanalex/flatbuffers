@@ -8,8 +8,42 @@ use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
 use \Google\FlatBuffers\Constants;
+use \Google\FlatBuffers\IUnpackableObject;
+use \Google\FlatBuffers\IGeneratedObject;
 
-class Test extends Struct
+class TestT implements IGeneratedObject
+{
+    /**
+     * @var short $a
+     */
+    public $a;
+
+    /**
+     * @var sbyte $b
+     */
+    public $b;
+
+    /**
+     * @param short $a
+     * @param sbyte $b
+     */
+    public function __construct($a = 0, $b = 0)
+    {
+        $this->a = $a;
+        $this->b = $b;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        return Test::createTest($builder, $this->a, $this->b);
+    }
+}
+
+class Test extends Struct implements IUnpackableObject
 {
     /**
      * @param int $_i offset
@@ -50,5 +84,24 @@ class Test extends Struct
         $builder->putSbyte($b);
         $builder->putShort($a);
         return $builder->offset();
+    }
+
+    /**
+     * @param TestT $o
+     */
+    public function unPackTo(&$o)
+    {
+        $o->a = $this->GetA();
+        $o->b = $this->GetB();
+    }
+
+    /**
+     * @return TestT
+     */
+    public function unPack()
+    {
+        $o = new TestT();
+        $this->unPackTo($o);
+        return $o;
     }
 }

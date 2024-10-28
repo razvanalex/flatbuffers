@@ -3,6 +3,49 @@
 
 namespace MyGame\Example;
 
+use \Google\FlatBuffers\FlatBufferBuilder;
+
+class AnyUniqueAliasesT
+{
+    /**
+     * @var AnyUniqueAliases $type
+     */
+    public $type;
+
+    /**
+     * @var mixed $value
+     */
+    public $value;
+
+    /**
+     * @param AnyUniqueAliases $type
+     * @param mixed $value
+     */
+    public function __construct($type, $value)
+    {
+        $this->type = $type;
+        $this->value = $value;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        switch ($this->type) {
+            case AnyUniqueAliases::M:
+                return $this->value->pack($builder);
+            case AnyUniqueAliases::TS:
+                return $this->value->pack($builder);
+            case AnyUniqueAliases::M2:
+                return $this->value->pack($builder);
+            default:
+                return 0;
+        }
+    }
+}
+
 class AnyUniqueAliases
 {
     const NONE = 0;
@@ -23,5 +66,25 @@ class AnyUniqueAliases
             throw new \Exception();
         }
         return self::$names[$e];
+    }
+
+    /**
+     * @return AnyUniqueAliasesT
+     */
+    public static function unPack($union_type, $accessor)
+    {
+        switch ($union_type) {
+            case AnyUniqueAliases::M:
+                $obj = $accessor(new \MyGame\Example\Monster());
+                return new AnyUniqueAliasesT($union_type, $obj->unPack());
+            case AnyUniqueAliases::TS:
+                $obj = $accessor(new \MyGame\Example\TestSimpleTableWithEnum());
+                return new AnyUniqueAliasesT($union_type, $obj->unPack());
+            case AnyUniqueAliases::M2:
+                $obj = $accessor(new \MyGame\Example2\Monster());
+                return new AnyUniqueAliasesT($union_type, $obj->unPack());
+            default:
+                return null;
+        }
     }
 }

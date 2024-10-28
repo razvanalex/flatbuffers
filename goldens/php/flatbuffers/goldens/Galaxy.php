@@ -8,6 +8,8 @@ use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
 use \Google\FlatBuffers\Constants;
+use \Google\FlatBuffers\IUnpackableObject;
+use \Google\FlatBuffers\IGeneratedObject;
 
 class Galaxy extends Table
 {
@@ -59,7 +61,7 @@ class Galaxy extends Table
      */
     public static function startGalaxy(FlatBufferBuilder $builder)
     {
-        $builder->StartObject(1);
+        $builder->startObject(1);
     }
 
     /**

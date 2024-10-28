@@ -3,6 +3,49 @@
 
 namespace MyGame\Example;
 
+use \Google\FlatBuffers\FlatBufferBuilder;
+
+class AnyAmbiguousAliasesT
+{
+    /**
+     * @var AnyAmbiguousAliases $type
+     */
+    public $type;
+
+    /**
+     * @var mixed $value
+     */
+    public $value;
+
+    /**
+     * @param AnyAmbiguousAliases $type
+     * @param mixed $value
+     */
+    public function __construct($type, $value)
+    {
+        $this->type = $type;
+        $this->value = $value;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        switch ($this->type) {
+            case AnyAmbiguousAliases::M1:
+                return $this->value->pack($builder);
+            case AnyAmbiguousAliases::M2:
+                return $this->value->pack($builder);
+            case AnyAmbiguousAliases::M3:
+                return $this->value->pack($builder);
+            default:
+                return 0;
+        }
+    }
+}
+
 class AnyAmbiguousAliases
 {
     const NONE = 0;
@@ -23,5 +66,25 @@ class AnyAmbiguousAliases
             throw new \Exception();
         }
         return self::$names[$e];
+    }
+
+    /**
+     * @return AnyAmbiguousAliasesT
+     */
+    public static function unPack($union_type, $accessor)
+    {
+        switch ($union_type) {
+            case AnyAmbiguousAliases::M1:
+                $obj = $accessor(new \MyGame\Example\Monster());
+                return new AnyAmbiguousAliasesT($union_type, $obj->unPack());
+            case AnyAmbiguousAliases::M2:
+                $obj = $accessor(new \MyGame\Example\Monster());
+                return new AnyAmbiguousAliasesT($union_type, $obj->unPack());
+            case AnyAmbiguousAliases::M3:
+                $obj = $accessor(new \MyGame\Example\Monster());
+                return new AnyAmbiguousAliasesT($union_type, $obj->unPack());
+            default:
+                return null;
+        }
     }
 }

@@ -8,8 +8,35 @@ use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
 use \Google\FlatBuffers\Constants;
+use \Google\FlatBuffers\IUnpackableObject;
+use \Google\FlatBuffers\IGeneratedObject;
 
-class StructOfStructsOfStructs extends Struct
+class StructOfStructsOfStructsT implements IGeneratedObject
+{
+    /**
+     * @var StructOfStructsT $a
+     */
+    public $a;
+
+    /**
+     * @param StructOfStructsT $a
+     */
+    public function __construct($a = null)
+    {
+        $this->a = $a;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        return StructOfStructsOfStructs::createStructOfStructsOfStructs($builder, $this->a->a->id, $this->a->a->distance, $this->a->b->a, $this->a->b->b, $this->a->c->id, $this->a->c->distance);
+    }
+}
+
+class StructOfStructsOfStructs extends Struct implements IUnpackableObject
 {
     /**
      * @param int $_i offset
@@ -52,5 +79,26 @@ class StructOfStructsOfStructs extends Struct
         $builder->putUint($a_a_distance);
         $builder->putUint($a_a_id);
         return $builder->offset();
+    }
+
+    /**
+     * @param StructOfStructsOfStructsT $o
+     */
+    public function unPackTo(&$o)
+    {
+        $a = $this->getA();
+        if ($a !== null) {
+            $o->a = $a->unPack();
+        }
+    }
+
+    /**
+     * @return StructOfStructsOfStructsT
+     */
+    public function unPack()
+    {
+        $o = new StructOfStructsOfStructsT();
+        $this->unPackTo($o);
+        return $o;
     }
 }

@@ -3,9 +3,13 @@
 require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "Constants.php"));
 require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "ByteBuffer.php"));
 require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "FlatBufferBuilder.php"));
+require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "ObjectAPI.php"));
 require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "Table.php"));
 require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "Struct.php"));
 foreach (glob(join(DIRECTORY_SEPARATOR, array(dirname(__FILE__), "MyGame", "Example", "*.php"))) as $file) {
+    require $file;
+}
+foreach (glob(join(DIRECTORY_SEPARATOR, array(dirname(__FILE__), "MyGame", "*.php"))) as $file) {
     require $file;
 }
 foreach (glob(join(DIRECTORY_SEPARATOR, array(dirname(__FILE__), "optional_scalars", "*.php"))) as $file) {
@@ -32,13 +36,14 @@ function main()
     $fbb = new Google\FlatBuffers\FlatBufferBuilder(1);
     createMonster($fbb, true);
     checkSizePrefixedBuffer($fbb, $assert);
-    test_buffer($assert, $fbb->dataBuffer(), true);
+    checkObjectAPI($assert, $fbb->dataBuffer(), true);
 
     $fbb->clear();  // Also, test clear
     $assert->strictEqual(strlen($fbb->dataBuffer()->data()), 0);
 
     createMonster($fbb, false);
     test_buffer($assert, $fbb->dataBuffer());
+    checkObjectAPI($assert, $fbb->dataBuffer(), false);
 
     // Test it:
     testByteBuffer($assert);
@@ -46,6 +51,7 @@ function main()
 //    testUnicode($assert);
     testCreateBytesVector($assert);
     testOptionalScalar($assert);
+    testObjectAPIDefaults($assert);
 
     echo 'FlatBuffers php test: completed successfully' . PHP_EOL;
 }
@@ -111,6 +117,67 @@ function createMonster(Google\FlatBuffers\FlatBufferBuilder $fbb,
     } else {
         \MyGame\Example\Monster::finishMonsterBuffer($fbb, $mon);
     }
+}
+
+function compareMonsterT(Assert $assert, \MyGame\Example\MonsterT $obj1, \MyGame\Example\MonsterT $obj2) {
+    $assert->strictEqual($obj1->pos, $obj2->pos);
+    $assert->strictEqual($obj1->mana, $obj2->mana);
+    $assert->strictEqual($obj1->hp, $obj2->hp);
+    $assert->strictEqual($obj1->name, $obj2->name);
+    $assert->strictEqual($obj1->inventory, $obj2->inventory);
+    $assert->strictEqual($obj1->color, $obj2->color);
+    $assert->strictEqual($obj1->test, $obj2->test);
+    $assert->strictEqual($obj1->test4, $obj2->test4);
+    $assert->strictEqual($obj1->testarrayofstring, $obj2->testarrayofstring);
+    $assert->strictEqual($obj1->testarrayoftables, $obj2->testarrayoftables);
+    $assert->strictEqual($obj1->enemy, $obj2->enemy);
+    $assert->strictEqual($obj1->testnestedflatbuffer, $obj2->testnestedflatbuffer);
+    $assert->strictEqual($obj1->testempty, $obj2->testempty);
+    $assert->strictEqual($obj1->testbool, $obj2->testbool);
+    $assert->strictEqual($obj1->testhashs32_fnv1, $obj2->testhashs32_fnv1);
+    $assert->strictEqual($obj1->testhashu32_fnv1, $obj2->testhashu32_fnv1);
+    $assert->strictEqual($obj1->testhashs64_fnv1, $obj2->testhashs64_fnv1);
+    $assert->strictEqual($obj1->testhashu64_fnv1, $obj2->testhashu64_fnv1);
+    $assert->strictEqual($obj1->testhashs32_fnv1a, $obj2->testhashs32_fnv1a);
+    $assert->strictEqual($obj1->testhashu32_fnv1a, $obj2->testhashu32_fnv1a);
+    $assert->strictEqual($obj1->testhashs64_fnv1a, $obj2->testhashs64_fnv1a);
+    $assert->strictEqual($obj1->testhashu64_fnv1a, $obj2->testhashu64_fnv1a);
+    $assert->strictEqual($obj1->testarrayofbools, $obj2->testarrayofbools);
+    $assert->strictEqual($obj1->testf, $obj2->testf);
+    $assert->strictEqual($obj1->testf2, $obj2->testf2);
+    $assert->strictEqual($obj1->testf3, $obj2->testf3);
+    $assert->strictEqual($obj1->testarrayofstring2, $obj2->testarrayofstring2);
+    $assert->strictEqual($obj1->testarrayofsortedstruct, $obj2->testarrayofsortedstruct);
+    $assert->strictEqual($obj1->flex, $obj2->flex);
+    $assert->strictEqual($obj1->test5, $obj2->test5);
+    $assert->strictEqual($obj1->vector_of_longs, $obj2->vector_of_longs);
+    $assert->strictEqual($obj1->vector_of_doubles, $obj2->vector_of_doubles);
+    $assert->strictEqual($obj1->parent_namespace_test, $obj2->parent_namespace_test);
+    $assert->strictEqual($obj1->vector_of_referrables, $obj2->vector_of_referrables);
+    $assert->strictEqual($obj1->single_weak_reference, $obj2->single_weak_reference);
+    $assert->strictEqual($obj1->vector_of_weak_references, $obj2->vector_of_weak_references);
+    $assert->strictEqual($obj1->vector_of_strong_referrables, $obj2->vector_of_strong_referrables);
+    $assert->strictEqual($obj1->co_owning_reference, $obj2->co_owning_reference);
+    $assert->strictEqual($obj1->vector_of_co_owning_references, $obj2->vector_of_co_owning_references);
+    $assert->strictEqual($obj1->non_owning_reference, $obj2->non_owning_reference);
+    $assert->strictEqual($obj1->vector_of_non_owning_references, $obj2->vector_of_non_owning_references);
+    $assert->strictEqual($obj1->any_unique, $obj2->any_unique);
+    $assert->strictEqual($obj1->any_ambiguous, $obj2->any_ambiguous);
+    $assert->strictEqual($obj1->vector_of_enums, $obj2->vector_of_enums);
+    $assert->strictEqual($obj1->signed_enum, $obj2->signed_enum);
+    $assert->strictEqual($obj1->testrequirednestedflatbuffer, $obj2->testrequirednestedflatbuffer);
+    $assert->strictEqual($obj1->scalar_key_sorted_tables, $obj2->scalar_key_sorted_tables);
+    $assert->strictEqual($obj1->native_inline, $obj2->native_inline);
+    $assert->strictEqual($obj1->long_enum_non_enum_default, $obj2->long_enum_non_enum_default);
+    $assert->strictEqual($obj1->long_enum_normal_default, $obj2->long_enum_normal_default);
+    $assert->ok((is_nan($obj1->nan_default) && is_nan($obj2->nan_default)) || ($obj1->nan_default == $obj2->nan_default));
+    $assert->strictEqual($obj1->inf_default, $obj2->inf_default);
+    $assert->strictEqual($obj1->positive_inf_default, $obj2->positive_inf_default);
+    $assert->strictEqual($obj1->infinity_default, $obj2->infinity_default);
+    $assert->strictEqual($obj1->positive_infinity_default, $obj2->positive_infinity_default);
+    $assert->strictEqual($obj1->negative_inf_default, $obj2->negative_inf_default);
+    $assert->strictEqual($obj1->negative_infinity_default, $obj2->negative_infinity_default);
+    $assert->strictEqual($obj1->double_inf_default, $obj2->double_inf_default);
 }
 
 function checkSizePrefixedBuffer(Google\FlatBuffers\FlatBufferBuilder $fbb,
@@ -457,6 +524,76 @@ function testOptionalScalar(Assert $assert) {
     $scalarStuff = createScalarStuff($fbb, $assigned);
     checkScalarStuff($assert, $scalarStuff, $assigned);
     $fbb->clear();
+
+    // Test ObjectAPI with defaults
+    $scalarStuffObj1 = new optional_scalars\ScalarStuffT(...$defaults);
+    $offset = $scalarStuffObj1->pack($fbb);
+    optional_scalars\ScalarStuff::finishScalarStuffBuffer($fbb, $offset);
+    $scalarStuff = optional_scalars\ScalarStuff::getRootAsScalarStuff($fbb->dataBuffer());
+    checkScalarStuff($assert, $scalarStuff, $defaults);
+    $scalarStuffObj2 = $scalarStuff->unPack();
+    $assert->Equal($scalarStuffObj1, $scalarStuffObj2);
+    $fbb->clear();
+
+    // Test ObjectAPI with assigned
+    $scalarStuffObj1 = new optional_scalars\ScalarStuffT(...$assigned);
+    $offset = $scalarStuffObj1->pack($fbb);
+    optional_scalars\ScalarStuff::finishScalarStuffBuffer($fbb, $offset);
+    $scalarStuff = optional_scalars\ScalarStuff::getRootAsScalarStuff($fbb->dataBuffer());
+    checkScalarStuff($assert, $scalarStuff, $assigned);
+    $scalarStuffObj2 = $scalarStuff->unPack();
+    $assert->Equal($scalarStuffObj1, $scalarStuffObj2);
+    $fbb->clear();
+}
+
+function testObjectAPIDefaults(Assert $assert) {
+    $fbb = new Google\FlatBuffers\FlatBufferBuilder(1);
+    $obj1 = new \MyGame\Example\MonsterT(name:"test");
+    \MyGame\Example\Monster::finishMonsterBuffer($fbb, $obj1->pack($fbb));
+    $object2 = \MyGame\Example\Monster::getRootAsMonster($fbb->dataBuffer());
+    $obj2 = $object2->unPack();
+    compareMonsterT($assert, $obj1, $obj2);
+}
+
+// FIXME: remove this
+function annotate(string $outputPath, string $schemaPath, string $payload) {
+    if (!$fp = fopen($outputPath, 'wb')) {
+        echo "error while opening the file $outputPath";
+        return;
+    }
+    if (fwrite($fp, $payload) === false) {
+        echo "could not write contents to $outputPath";
+        return;
+    }
+    fclose($fp);
+
+    system("flatc -I include_test --annotate $schemaPath -- $outputPath", $rc);
+    $outputPathAfb = str_replace("txt", "afb", $outputPath);
+    system("cat $outputPathAfb", $rc);
+}
+
+function checkObjectAPI(Assert $assert, Google\FlatBuffers\ByteBuffer $bb, $size_prefixed) {
+    if ($size_prefixed) {
+        $monster = \MyGame\Example\Monster::getSizePrefixedRootAsMonster($bb);
+        $monster = $monster->unPack();
+    } else {
+        $monster = \MyGame\Example\Monster::getRootAsMonster($bb)->unPack();
+    }
+
+    $assert->strictEqual($monster->hp, 80, "hp not 80");
+    $assert->strictEqual($monster->mana, 150, "mana not 150");  // default
+    if ($monster->test !== null) {
+        $monster->test->value->nan_default = 0.0;
+    }
+    if ($monster->enemy !== null) {
+        $monster->enemy->nan_default = 0.0;
+    }
+    $monster->nan_default = 0.0;
+
+    $fbb = new Google\FlatBuffers\FlatBufferBuilder(1);
+    \MyGame\Example\Monster::finishMonsterBuffer($fbb, $monster->pack($fbb));
+    $monster2 = \MyGame\Example\Monster::getRootAsMonster($fbb->dataBuffer())->unPack();
+    $assert->Equal($monster, $monster2, "pack()/unPack() failed");
 }
 
 //function testUnicode(Assert $assert) {

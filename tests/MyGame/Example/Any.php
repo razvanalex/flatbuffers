@@ -3,6 +3,49 @@
 
 namespace MyGame\Example;
 
+use \Google\FlatBuffers\FlatBufferBuilder;
+
+class AnyT
+{
+    /**
+     * @var Any $type
+     */
+    public $type;
+
+    /**
+     * @var mixed $value
+     */
+    public $value;
+
+    /**
+     * @param Any $type
+     * @param mixed $value
+     */
+    public function __construct($type, $value)
+    {
+        $this->type = $type;
+        $this->value = $value;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        switch ($this->type) {
+            case Any::Monster:
+                return $this->value->pack($builder);
+            case Any::TestSimpleTableWithEnum:
+                return $this->value->pack($builder);
+            case Any::MyGame_Example2_Monster:
+                return $this->value->pack($builder);
+            default:
+                return 0;
+        }
+    }
+}
+
 class Any
 {
     const NONE = 0;
@@ -23,5 +66,25 @@ class Any
             throw new \Exception();
         }
         return self::$names[$e];
+    }
+
+    /**
+     * @return AnyT
+     */
+    public static function unPack($union_type, $accessor)
+    {
+        switch ($union_type) {
+            case Any::Monster:
+                $obj = $accessor(new \MyGame\Example\Monster());
+                return new AnyT($union_type, $obj->unPack());
+            case Any::TestSimpleTableWithEnum:
+                $obj = $accessor(new \MyGame\Example\TestSimpleTableWithEnum());
+                return new AnyT($union_type, $obj->unPack());
+            case Any::MyGame_Example2_Monster:
+                $obj = $accessor(new \MyGame\Example2\Monster());
+                return new AnyT($union_type, $obj->unPack());
+            default:
+                return null;
+        }
     }
 }

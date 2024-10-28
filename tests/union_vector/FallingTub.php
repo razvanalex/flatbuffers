@@ -6,8 +6,35 @@ use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
 use \Google\FlatBuffers\Constants;
+use \Google\FlatBuffers\IUnpackableObject;
+use \Google\FlatBuffers\IGeneratedObject;
 
-class FallingTub extends Struct
+class FallingTubT implements IGeneratedObject
+{
+    /**
+     * @var int $weight
+     */
+    public $weight;
+
+    /**
+     * @param int $weight
+     */
+    public function __construct($weight = 0)
+    {
+        $this->weight = $weight;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        return FallingTub::createFallingTub($builder, $this->weight);
+    }
+}
+
+class FallingTub extends Struct implements IUnpackableObject
 {
     /**
      * @param int $_i offset
@@ -38,5 +65,23 @@ class FallingTub extends Struct
         $builder->prep(4, 4);
         $builder->putInt($weight);
         return $builder->offset();
+    }
+
+    /**
+     * @param FallingTubT $o
+     */
+    public function unPackTo(&$o)
+    {
+        $o->weight = $this->GetWeight();
+    }
+
+    /**
+     * @return FallingTubT
+     */
+    public function unPack()
+    {
+        $o = new FallingTubT();
+        $this->unPackTo($o);
+        return $o;
     }
 }
