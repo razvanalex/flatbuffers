@@ -2,10 +2,13 @@
 // manual load for testing. please use PSR style autoloader when you use flatbuffers.
 require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "Constants.php"));
 require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "ByteBuffer.php"));
-require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "FlatbufferBuilder.php"));
+require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "FlatBufferBuilder.php"));
 require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "Table.php"));
 require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "Struct.php"));
 foreach (glob(join(DIRECTORY_SEPARATOR, array(dirname(__FILE__), "MyGame", "Example", "*.php"))) as $file) {
+    require $file;
+}
+foreach (glob(join(DIRECTORY_SEPARATOR, array(dirname(__FILE__), "optional_scalars", "*.php"))) as $file) {
     require $file;
 }
 
@@ -27,7 +30,40 @@ function main()
     // normally a size larger than the typical FlatBuffer you generate would be
     // better for performance.
     $fbb = new Google\FlatBuffers\FlatBufferBuilder(1);
+    createMonster($fbb, true);
+    checkSizePrefixedBuffer($fbb, $assert);
+    test_buffer($assert, $fbb->dataBuffer(), true);
 
+    $fbb->clear();  // Also, test clear
+    $assert->strictEqual(strlen($fbb->dataBuffer()->data()), 0);
+
+    createMonster($fbb, false);
+    test_buffer($assert, $fbb->dataBuffer());
+
+    // Test it:
+    testByteBuffer($assert);
+    fuzzTest1($assert);
+//    testUnicode($assert);
+    testCreateBytesVector($assert);
+    testOptionalScalar($assert);
+
+    echo 'FlatBuffers php test: completed successfully' . PHP_EOL;
+}
+
+try {
+    main();
+    exit(0);
+} catch(Exception $e) {
+    printf("Fatal error: Uncaught exception '%s' with message '%s. in %s:%d\n", get_class($e), $e->getMessage(), $e->getFile(), $e->getLine());
+    printf("Stack trace:\n");
+    echo $e->getTraceAsString() . PHP_EOL;
+    printf("  thrown in in %s:%d\n", $e->getFile(), $e->getLine());
+
+    die(-1);
+}
+
+function createMonster(Google\FlatBuffers\FlatBufferBuilder $fbb,
+                       bool $sizePrefix = false) {
     // We set up the same values as monsterdata.json:
     $str = $fbb->createString("MyMonster");
     $name = $fbb->createString('Fred');
@@ -70,34 +106,28 @@ function main()
     \MyGame\Example\Monster::AddTestbool($fbb, true);
     $mon = \MyGame\Example\Monster::EndMonster($fbb);
 
-    \MyGame\Example\Monster::FinishMonsterBuffer($fbb, $mon);
-
-    // Test it:
-    test_buffer($assert, $fbb->dataBuffer());
-
-    testByteBuffer($assert);
-    fuzzTest1($assert);
-//    testUnicode($assert);
-
-    echo 'FlatBuffers php test: completed successfully' . PHP_EOL;
+    if ($sizePrefix) {
+        \MyGame\Example\Monster::finishSizePrefixedMonsterBuffer($fbb, $mon);
+    } else {
+        \MyGame\Example\Monster::finishMonsterBuffer($fbb, $mon);
+    }
 }
 
-try {
-    main();
-    exit(0);
-} catch(Exception $e) {
-    printf("Fatal error: Uncaught exception '%s' with message '%s. in %s:%d\n", get_class($e), $e->getMessage(), $e->getFile(), $e->getLine());
-    printf("Stack trace:\n");
-    echo $e->getTraceAsString() . PHP_EOL;
-    printf("  thrown in in %s:%d\n", $e->getFile(), $e->getLine());
-
-    die(-1);
+function checkSizePrefixedBuffer(Google\FlatBuffers\FlatBufferBuilder $fbb,
+                                 Assert $assert) {
+	// Check that the size prefix is the size of the buffer of minus 4 bytes
+	$size = $fbb->bb->getInt($fbb->bb->capacity() - $fbb->offset());
+	$expectedSize = $fbb->offset() - 4;
+	$assert->strictEqual($size, $expectedSize);
 }
 
-function test_buffer(Assert $assert, Google\FlatBuffers\ByteBuffer $bb) {
-
-    $assert->ok(MyGame\Example\Monster::MonsterBufferHasIdentifier($bb));
-    $monster = \MyGame\Example\Monster::GetRootAsMonster($bb);
+function test_buffer(Assert $assert, Google\FlatBuffers\ByteBuffer $bb, $size_prefixed = false) {
+    if ($size_prefixed) {
+        $monster = \MyGame\Example\Monster::getSizePrefixedRootAsMonster($bb);
+    } else {
+        $monster = \MyGame\Example\Monster::GetRootAsMonster($bb);
+    }
+    $assert->ok(\MyGame\Example\Monster::MonsterBufferHasIdentifier($bb, $size_prefixed));
 
     $assert->strictEqual($monster->GetHp(), 80);
     $assert->strictEqual($monster->GetMana(), 150); // default
@@ -143,6 +173,290 @@ function test_buffer(Assert $assert, Google\FlatBuffers\ByteBuffer $bb) {
     $assert->Equal('Fred', $fred->getName());
 
     $assert->strictEqual($monster->GetTestbool(), true);
+}
+
+function testCreateBytesVector(Assert $assert) {
+    $fbb = new Google\FlatBuffers\FlatBufferBuilder(1);
+
+    foreach  ([[], [1, 2, 3, 0, 4, 5, 255, 6, 7]] as $d) {
+        // Make sure data is not necessarily UTF-8 encoded
+        $data = implode(array_map("chr", $d));
+
+        $fbb->clear();
+        $name_offset = $fbb->createString("required");
+        $inventory_offset = $fbb->createBytesVector($data);
+
+        \MyGame\Example\Monster::startMonster($fbb);
+        \MyGame\Example\Monster::addName($fbb, $name_offset);
+        \MyGame\Example\Monster::addInventory($fbb, $inventory_offset);
+        $fbb->finish(\MyGame\Example\Monster::endMonster($fbb));
+
+        $decoded_monster = \MyGame\Example\Monster::getRootAsMonster($fbb->dataBuffer());
+        $got = $decoded_monster->getInventoryBytes();
+        $assert->strictEqual($got, $data);
+        $assert->strictEqual(strlen($got), count($d));
+    }
+}
+
+function createScalarStuff(Google\FlatBuffers\FlatBufferBuilder $fbb, array $assign) {
+    optional_scalars\ScalarStuff::startScalarStuff($fbb);
+    if (array_key_exists("just_i8", $assign)) {
+        optional_scalars\ScalarStuff::addJustI8($fbb, $assign["just_i8"]);
+    }
+    if (array_key_exists("maybe_i8", $assign)) {
+        optional_scalars\ScalarStuff::addMaybeI8($fbb, $assign["maybe_i8"]);
+    }
+    if (array_key_exists("default_i8", $assign)) {
+        optional_scalars\ScalarStuff::addDefaultI8($fbb, $assign["default_i8"]);
+    }
+    if (array_key_exists("just_u8", $assign)) {
+        optional_scalars\ScalarStuff::addJustU8($fbb, $assign["just_u8"]);
+    }
+    if (array_key_exists("maybe_u8", $assign)) {
+        optional_scalars\ScalarStuff::addMaybeU8($fbb, $assign["maybe_u8"]);
+    }
+    if (array_key_exists("default_u8", $assign)) {
+        optional_scalars\ScalarStuff::addDefaultU8($fbb, $assign["default_u8"]);
+    }
+    if (array_key_exists("just_i16", $assign)) {
+        optional_scalars\ScalarStuff::addJustI16($fbb, $assign["just_i16"]);
+    }
+    if (array_key_exists("maybe_i16", $assign)) {
+        optional_scalars\ScalarStuff::addMaybeI16($fbb, $assign["maybe_i16"]);
+    }
+    if (array_key_exists("default_i16", $assign)) {
+        optional_scalars\ScalarStuff::addDefaultI16($fbb, $assign["default_i16"]);
+    }
+    if (array_key_exists("just_u16", $assign)) {
+        optional_scalars\ScalarStuff::addJustU16($fbb, $assign["just_u16"]);
+    }
+    if (array_key_exists("maybe_u16", $assign)) {
+        optional_scalars\ScalarStuff::addMaybeU16($fbb, $assign["maybe_u16"]);
+    }
+    if (array_key_exists("default_u16", $assign)) {
+        optional_scalars\ScalarStuff::addDefaultU16($fbb, $assign["default_u16"]);
+    }
+    if (array_key_exists("just_i32", $assign)) {
+        optional_scalars\ScalarStuff::addJustI32($fbb, $assign["just_i32"]);
+    }
+    if (array_key_exists("maybe_i32", $assign)) {
+        optional_scalars\ScalarStuff::addMaybeI32($fbb, $assign["maybe_i32"]);
+    }
+    if (array_key_exists("default_i32", $assign)) {
+        optional_scalars\ScalarStuff::addDefaultI32($fbb, $assign["default_i32"]);
+    }
+    if (array_key_exists("just_u32", $assign)) {
+        optional_scalars\ScalarStuff::addJustU32($fbb, $assign["just_u32"]);
+    }
+    if (array_key_exists("maybe_u32", $assign)) {
+        optional_scalars\ScalarStuff::addMaybeU32($fbb, $assign["maybe_u32"]);
+    }
+    if (array_key_exists("default_u32", $assign)) {
+        optional_scalars\ScalarStuff::addDefaultU32($fbb, $assign["default_u32"]);
+    }
+    if (array_key_exists("just_i64", $assign)) {
+        optional_scalars\ScalarStuff::addJustI64($fbb, $assign["just_i64"]);
+    }
+    if (array_key_exists("maybe_i64", $assign)) {
+        optional_scalars\ScalarStuff::addMaybeI64($fbb, $assign["maybe_i64"]);
+    }
+    if (array_key_exists("default_i64", $assign)) {
+        optional_scalars\ScalarStuff::addDefaultI64($fbb, $assign["default_i64"]);
+    }
+    if (array_key_exists("just_u64", $assign)) {
+        optional_scalars\ScalarStuff::addJustU64($fbb, $assign["just_u64"]);
+    }
+    if (array_key_exists("maybe_u64", $assign)) {
+        optional_scalars\ScalarStuff::addMaybeU64($fbb, $assign["maybe_u64"]);
+    }
+    if (array_key_exists("default_u64", $assign)) {
+        optional_scalars\ScalarStuff::addDefaultU64($fbb, $assign["default_u64"]);
+    }
+    if (array_key_exists("just_f32", $assign)) {
+        optional_scalars\ScalarStuff::addJustF32($fbb, $assign["just_f32"]);
+    }
+    if (array_key_exists("maybe_f32", $assign)) {
+        optional_scalars\ScalarStuff::addMaybeF32($fbb, $assign["maybe_f32"]);
+    }
+    if (array_key_exists("default_f32", $assign)) {
+        optional_scalars\ScalarStuff::addDefaultF32($fbb, $assign["default_f32"]);
+    }
+    if (array_key_exists("just_f64", $assign)) {
+        optional_scalars\ScalarStuff::addJustF64($fbb, $assign["just_f64"]);
+    }
+    if (array_key_exists("maybe_f64", $assign)) {
+        optional_scalars\ScalarStuff::addMaybeF64($fbb, $assign["maybe_f64"]);
+    }
+    if (array_key_exists("default_f64", $assign)) {
+        optional_scalars\ScalarStuff::addDefaultF64($fbb, $assign["default_f64"]);
+    }
+    if (array_key_exists("just_bool", $assign)) {
+        optional_scalars\ScalarStuff::addJustBool($fbb, $assign["just_bool"]);
+    }
+    if (array_key_exists("maybe_bool", $assign)) {
+        optional_scalars\ScalarStuff::addMaybeBool($fbb, $assign["maybe_bool"]);
+    }
+    if (array_key_exists("default_bool", $assign)) {
+        optional_scalars\ScalarStuff::addDefaultBool($fbb, $assign["default_bool"]);
+    }
+    if (array_key_exists("just_enum", $assign)) {
+        optional_scalars\ScalarStuff::addJustEnum($fbb, $assign["just_enum"]);
+    }
+    if (array_key_exists("maybe_enum", $assign)) {
+        optional_scalars\ScalarStuff::addMaybeEnum($fbb, $assign["maybe_enum"]);
+    }
+    if (array_key_exists("default_enum", $assign)) {
+        optional_scalars\ScalarStuff::addDefaultEnum($fbb, $assign["default_enum"]);
+    }
+    $offset = $fbb->endObject();
+    optional_scalars\ScalarStuff::finishScalarStuffBuffer($fbb, $offset);
+    return optional_scalars\ScalarStuff::getRootAsScalarStuff($fbb->dataBuffer());
+}
+
+function checkScalarStuff(Assert $assert, optional_scalars\ScalarStuff $scalarStuff, array $expected) {
+    $assert->strictEqual($scalarStuff->getJustI8(), $expected["just_i8"]);
+    $assert->strictEqual($scalarStuff->getMaybeI8(), $expected["maybe_i8"]);
+    $assert->strictEqual($scalarStuff->getDefaultI8(), $expected["default_i8"]);
+
+    $assert->strictEqual($scalarStuff->getJustU8(), $expected["just_u8"]);
+    $assert->strictEqual($scalarStuff->getMaybeU8(), $expected["maybe_u8"]);
+    $assert->strictEqual($scalarStuff->getDefaultU8(), $expected["default_u8"]);
+
+    $assert->strictEqual($scalarStuff->getJustI16(), $expected["just_i16"]);
+    $assert->strictEqual($scalarStuff->getMaybeI16(), $expected["maybe_i16"]);
+    $assert->strictEqual($scalarStuff->getDefaultI16(), $expected["default_i16"]);
+
+    $assert->strictEqual($scalarStuff->getJustU16(), $expected["just_u16"]);
+    $assert->strictEqual($scalarStuff->getMaybeU16(), $expected["maybe_u16"]);
+    $assert->strictEqual($scalarStuff->getDefaultU16(), $expected["default_u16"]);
+
+    $assert->strictEqual($scalarStuff->getJustI32(), $expected["just_i32"]);
+    $assert->strictEqual($scalarStuff->getMaybeI32(), $expected["maybe_i32"]);
+    $assert->strictEqual($scalarStuff->getDefaultI32(), $expected["default_i32"]);
+
+    $assert->strictEqual($scalarStuff->getJustU32(), $expected["just_u32"]);
+    $assert->strictEqual($scalarStuff->getMaybeU32(), $expected["maybe_u32"]);
+    $assert->strictEqual($scalarStuff->getDefaultU32(), $expected["default_u32"]);
+
+    $assert->strictEqual($scalarStuff->getJustI64(), $expected["just_i64"]);
+    $assert->strictEqual($scalarStuff->getMaybeI64(), $expected["maybe_i64"]);
+    $assert->strictEqual($scalarStuff->getDefaultI64(), $expected["default_i64"]);
+
+    $assert->strictEqual($scalarStuff->getJustU64(), $expected["just_u64"]);
+    $assert->strictEqual($scalarStuff->getMaybeU64(), $expected["maybe_u64"]);
+    $assert->strictEqual($scalarStuff->getDefaultU64(), $expected["default_u64"]);
+
+    $assert->strictEqual($scalarStuff->getJustF32(), $expected["just_f32"]);
+    $assert->strictEqual($scalarStuff->getMaybeF32(), $expected["maybe_f32"]);
+    $assert->strictEqual($scalarStuff->getDefaultF32(), $expected["default_f32"]);
+
+    $assert->strictEqual($scalarStuff->getJustF64(), $expected["just_f64"]);
+    $assert->strictEqual($scalarStuff->getMaybeF64(), $expected["maybe_f64"]);
+    $assert->strictEqual($scalarStuff->getDefaultF64(), $expected["default_f64"]);
+
+    $assert->strictEqual($scalarStuff->getJustBool(), $expected["just_bool"]);
+    $assert->strictEqual($scalarStuff->getMaybeBool(), $expected["maybe_bool"]);
+    $assert->strictEqual($scalarStuff->getDefaultBool(), $expected["default_bool"]);
+
+    $assert->strictEqual($scalarStuff->getJustEnum(), $expected["just_enum"]);
+    $assert->strictEqual($scalarStuff->getMaybeEnum(), $expected["maybe_enum"]);
+    $assert->strictEqual($scalarStuff->getDefaultEnum(), $expected["default_enum"]);
+}
+
+function testOptionalScalar(Assert $assert) {
+    $defaults = array(
+        "just_i8" => 0,
+        "maybe_i8" => null,
+        "default_i8" => 42,
+        "just_u8" => 0,
+        "maybe_u8" => null,
+        "default_u8" => 42,
+        "just_i16" => 0,
+        "maybe_i16" => null,
+        "default_i16" => 42,
+        "just_u16" => 0,
+        "maybe_u16" => null,
+        "default_u16" => 42,
+        "just_i32" => 0,
+        "maybe_i32" => null,
+        "default_i32" => 42,
+        "just_u32" => 0,
+        "maybe_u32" => null,
+        "default_u32" => 42,
+        "just_i64" => 0,
+        "maybe_i64" => null,
+        "default_i64" => 42,
+        "just_u64" => 0,
+        "maybe_u64" => null,
+        "default_u64" => 42,
+        "just_f32" => 0.0,
+        "maybe_f32" => null,
+        "default_f32" => 42.0,
+        "just_f64" => 0.0,
+        "maybe_f64" => null,
+        "default_f64" => 42.0,
+        "just_bool" => false,
+        "maybe_bool" => null,
+        "default_bool" => true,
+        "just_enum" => \optional_scalars\OptionalByte::None,
+        "maybe_enum" => null,
+        "default_enum" => \optional_scalars\OptionalByte::One
+    );
+    $assigned = array(
+        "just_i8" => 5,
+        "maybe_i8" => 5,
+        "default_i8" => 5,
+        "just_u8" => 6,
+        "maybe_u8" => 6,
+        "default_u8" => 6,
+        "just_i16" => 7,
+        "maybe_i16" => 7,
+        "default_i16" => 7,
+        "just_u16" => 8,
+        "maybe_u16" => 8,
+        "default_u16" => 8,
+        "just_i32" => 9,
+        "maybe_i32" => 9,
+        "default_i32" => 9,
+        "just_u32" => 10,
+        "maybe_u32" => 10,
+        "default_u32" => 10,
+        "just_i64" => 11,
+        "maybe_i64" => 11,
+        "default_i64" => 11,
+        "just_u64" => 12,
+        "maybe_u64" => 12,
+        "default_u64" => 12,
+        "just_f32" => 13.0,
+        "maybe_f32" => 13.0,
+        "default_f32" => 13.0,
+        "just_f64" => 14.0,
+        "maybe_f64" => 14.0,
+        "default_f64" => 14.0,
+        "just_bool" => true,
+        "maybe_bool" => true,
+        "default_bool" => true,
+        "just_enum" => \optional_scalars\OptionalByte::Two,
+        "maybe_enum" => \optional_scalars\OptionalByte::Two,
+        "default_enum" => \optional_scalars\OptionalByte::Two
+    );
+
+    $fbb = new Google\FlatBuffers\FlatBufferBuilder(1);
+
+    // Test default values
+    $scalarStuff = createScalarStuff($fbb, array());
+    checkScalarStuff($assert, $scalarStuff, $defaults);
+    $fbb->clear();
+
+    // Test defaults assigned values
+    $scalarStuff = createScalarStuff($fbb, $defaults);
+    checkScalarStuff($assert, $scalarStuff, $defaults);
+    $fbb->clear();
+
+    // Test assigned values
+    $scalarStuff = createScalarStuff($fbb, $assigned);
+    checkScalarStuff($assert, $scalarStuff, $assigned);
+    $fbb->clear();
 }
 
 //function testUnicode(Assert $assert) {
