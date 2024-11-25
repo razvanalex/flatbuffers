@@ -6,8 +6,38 @@ use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
 use \Google\FlatBuffers\Constants;
+use \Google\FlatBuffers\IUnpackableObject;
+use \Google\FlatBuffers\IGeneratedObject;
 
-class Attacker extends Table
+class AttackerT implements IGeneratedObject
+{
+    /**
+     * @var int $sword_attack_damage
+     */
+    public $sword_attack_damage;
+
+    /**
+     * @param int $sword_attack_damage
+     */
+    public function __construct($sword_attack_damage = 0)
+    {
+        $this->sword_attack_damage = $sword_attack_damage;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        Attacker::startAttacker($builder);
+        Attacker::addSwordAttackDamage($builder, $this->sword_attack_damage);
+        $attacker = Attacker::endAttacker($builder);
+        return $attacker;
+    }
+}
+
+class Attacker extends Table implements IUnpackableObject
 {
     /**
      * @param ByteBuffer $bb
@@ -67,7 +97,7 @@ class Attacker extends Table
      */
     public static function startAttacker(FlatBufferBuilder $builder)
     {
-        $builder->StartObject(1);
+        $builder->startObject(1);
     }
 
     /**
@@ -99,6 +129,24 @@ class Attacker extends Table
     public static function endAttacker(FlatBufferBuilder $builder)
     {
         $o = $builder->endObject();
+        return $o;
+    }
+
+    /**
+     * @param AttackerT $o
+     */
+    public function unPackTo(&$o)
+    {
+        $o->sword_attack_damage = $this->getSwordAttackDamage();
+    }
+
+    /**
+     * @return AttackerT
+     */
+    public function unPack()
+    {
+        $o = new AttackerT();
+        $this->unPackTo($o);
         return $o;
     }
 }
