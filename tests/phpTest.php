@@ -3,7 +3,8 @@
 require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "Constants.php"));
 require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "ByteBuffer.php"));
 require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "FlatBufferBuilder.php"));
-require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "ObjectAPI.php"));
+require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "IGeneratedObject.php"));
+require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "IUnpackableObject.php"));
 require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "Table.php"));
 require join(DIRECTORY_SEPARATOR, array(dirname(dirname(__FILE__)), "php", "Struct.php"));
 foreach (glob(join(DIRECTORY_SEPARATOR, array(dirname(__FILE__), "MyGame", "Example", "*.php"))) as $file) {
