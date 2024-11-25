@@ -737,7 +737,7 @@ class PhpGenerator : public BaseGenerator {
       }
     }
     code += Indent + Indent + struct_var + " = " + struct_type +
-            "::" + namer_.Method("end", struct_type) + "($builder);\n";
+            "::" + "end" + struct_type + "($builder);\n";
     code += Indent + Indent + "return " + struct_var + ";\n";
     code += Indent + "}\n";
 
