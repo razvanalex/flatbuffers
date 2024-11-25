@@ -30,12 +30,3 @@ interface IUnpackableObject
      */
     public function unPackTo(IGeneratedObject &$o);
 }
-
-interface IGeneratedObject
-{
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder);
-}
