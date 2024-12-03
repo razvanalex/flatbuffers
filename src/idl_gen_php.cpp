@@ -869,18 +869,7 @@ class PhpGenerator : public BaseGenerator {
   }
 
   template<typename T> std::string ModuleFor(const T *def) const {
-    // TODO: cleanup this mess
-    if (!parser_.opts.one_file) { return "\\" + namer_.NamespacedType(*def); }
-
-    std::string filename =
-        StripExtension(def->file) + parser_.opts.filename_suffix;
-    if (parser_.file_being_parsed_ == def->file) {
-      return "\\" + StripPath(filename);  // make it a "local" import
-    }
-
-    std::string module = parser_.opts.include_prefix + filename;
-    std::replace(module.begin(), module.end(), '/', '\\');
-    return "\\" + module;
+    return "\\" + namer_.NamespacedType(*def);
   }
 
   // Begin by declaring namespace and imports.
@@ -1071,10 +1060,9 @@ class PhpGenerator : public BaseGenerator {
     code += Indent + "public function " + namer_.Method("get", field) + "()\n";
     code += Indent + "{\n";
     code += Indent + Indent + "$o = $this->__offset(" +
-            NumToString(field.value.offset) + ");\n" + Indent + Indent +
-            "return $o != 0 ? ";
-    code += "$this->bb->";
-    code += namer_.Method("get", GenTypeGet(field.value.type)) +
+            NumToString(field.value.offset) + ");\n";
+    code += Indent + Indent + "return $o != 0 ? ";
+    code += "$this->bb->" + namer_.Method("get", GenTypeGet(field.value.type)) +
             "($o + $this->bb_pos)";
     code += " : " + GenDefaultValue(field) + ";\n";
     code += Indent + "}\n\n";
@@ -1814,7 +1802,7 @@ class PhpGenerator : public BaseGenerator {
   }
 
   std::string ScalarType(const FieldDef &field) {
-    return ConvertCase(GenTypeGet(field.value.type), Case::kUpperCamel);
+    return GenTypeGet(field.value.type);
   }
 
   SimpleFloatConstantGenerator float_const_gen_;
