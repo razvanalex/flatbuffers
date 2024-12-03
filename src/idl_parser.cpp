@@ -2682,8 +2682,7 @@ bool Parser::SupportsOptionalScalars(const flatbuffers::IDLOptions &opts) {
       IDLOptions::kKotlin | IDLOptions::kKotlinKmp | IDLOptions::kCpp |
       IDLOptions::kJava | IDLOptions::kCSharp | IDLOptions::kTs |
       IDLOptions::kBinary | IDLOptions::kGo | IDLOptions::kPython |
-      IDLOptions::kJson |
-      IDLOptions::kNim;
+      IDLOptions::kJson | IDLOptions::kPhp | IDLOptions::kNim;
   unsigned long langs = opts.lang_to_generate;
   return (langs > 0 && langs < IDLOptions::kMAX) && !(langs & ~supported_langs);
 }

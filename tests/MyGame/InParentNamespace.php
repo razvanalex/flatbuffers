@@ -8,8 +8,10 @@ use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
 use \Google\FlatBuffers\Constants;
+use \Google\FlatBuffers\IUnpackableObject;
+use \Google\FlatBuffers\IGeneratedObject;
 
-class InParentNamespace extends Table
+class InParentNamespace extends Table implements IUnpackableObject
 {
     /**
      * @param ByteBuffer $bb
@@ -65,7 +67,7 @@ class InParentNamespace extends Table
      */
     public static function startInParentNamespace(FlatBufferBuilder $builder)
     {
-        $builder->StartObject(0);
+        $builder->startObject(0);
     }
 
     /**
@@ -87,5 +89,40 @@ class InParentNamespace extends Table
     {
         $o = $builder->endObject();
         return $o;
+    }
+
+    /**
+     * @param InParentNamespaceT $o
+     */
+    public function unPackTo(&$o)
+    {
+    }
+
+    /**
+     * @return InParentNamespaceT
+     */
+    public function unPack()
+    {
+        $o = new InParentNamespaceT();
+        $this->unPackTo($o);
+        return $o;
+    }
+}
+
+class InParentNamespaceT implements IGeneratedObject
+{
+    public function __construct()
+    {
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        InParentNamespace::startInParentNamespace($builder);
+        $inParentNamespace = InParentNamespace::endInParentNamespace($builder);
+        return $inParentNamespace;
     }
 }

@@ -8,9 +8,11 @@ use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
 use \Google\FlatBuffers\Constants;
+use \Google\FlatBuffers\IUnpackableObject;
+use \Google\FlatBuffers\IGeneratedObject;
 
 /// an example documentation comment: "monster object"
-class Monster extends Table
+class Monster extends Table implements IUnpackableObject
 {
     /**
      * @param ByteBuffer $bb
@@ -62,9 +64,9 @@ class Monster extends Table
 
     public function getPos()
     {
-        $obj = new Vec3();
+        $obj = new \MyGame\Example\Vec3();
         $o = $this->__offset(4);
-        return $o != 0 ? $obj->init($o + $this->bb_pos, $this->bb) : 0;
+        return $o != 0 ? $obj->init($o + $this->bb_pos, $this->bb) : null;
     }
 
     /**
@@ -98,7 +100,7 @@ class Monster extends Table
     public function getInventory($j)
     {
         $o = $this->__offset(14);
-        return $o != 0 ? $this->bb->getByte($this->__vector($o) + $j * 1) : 0;
+        return $o != 0 ? $this->bb->getByte($this->__vector($o) + $j * 1) : array();
     }
 
     /**
@@ -137,7 +139,7 @@ class Monster extends Table
     }
 
     /**
-     * @returnint
+     * @return int
      */
     public function getTest($obj)
     {
@@ -146,7 +148,7 @@ class Monster extends Table
     }
 
     /**
-     * @returnVectorOffset
+     * @return VectorOffset
      */
     public function getTest4($j)
     {
@@ -171,7 +173,7 @@ class Monster extends Table
     public function getTestarrayofstring($j)
     {
         $o = $this->__offset(24);
-        return $o != 0 ? $this->__string($this->__vector($o) + $j * 4) : 0;
+        return $o != 0 ? $this->__string($this->__vector($o) + $j * 4) : array();
     }
 
     /**
@@ -186,7 +188,7 @@ class Monster extends Table
     /// an example documentation comment: this will end up in the generated code
     /// multiline too
     /**
-     * @returnVectorOffset
+     * @return VectorOffset
      */
     public function getTestarrayoftables($j)
     {
@@ -206,9 +208,9 @@ class Monster extends Table
 
     public function getEnemy()
     {
-        $obj = new Monster();
+        $obj = new \MyGame\Example\Monster();
         $o = $this->__offset(28);
-        return $o != 0 ? $obj->init($this->__indirect($o + $this->bb_pos), $this->bb) : 0;
+        return $o != 0 ? $obj->init($this->__indirect($o + $this->bb_pos), $this->bb) : null;
     }
 
     /**
@@ -218,7 +220,7 @@ class Monster extends Table
     public function getTestnestedflatbuffer($j)
     {
         $o = $this->__offset(30);
-        return $o != 0 ? $this->bb->getByte($this->__vector($o) + $j * 1) : 0;
+        return $o != 0 ? $this->bb->getByte($this->__vector($o) + $j * 1) : array();
     }
 
     /**
@@ -240,9 +242,9 @@ class Monster extends Table
 
     public function getTestempty()
     {
-        $obj = new Stat();
+        $obj = new \MyGame\Example\Stat();
         $o = $this->__offset(32);
-        return $o != 0 ? $obj->init($this->__indirect($o + $this->bb_pos), $this->bb) : 0;
+        return $o != 0 ? $obj->init($this->__indirect($o + $this->bb_pos), $this->bb) : null;
     }
 
     /**
@@ -333,7 +335,7 @@ class Monster extends Table
     public function getTestarrayofbools($j)
     {
         $o = $this->__offset(52);
-        return $o != 0 ? $this->bb->getBool($this->__vector($o) + $j * 1) : 0;
+        return $o != 0 ? $this->bb->getBool($this->__vector($o) + $j * 1) : array();
     }
 
     /**
@@ -379,7 +381,7 @@ class Monster extends Table
     public function getTestarrayofstring2($j)
     {
         $o = $this->__offset(60);
-        return $o != 0 ? $this->__string($this->__vector($o) + $j * 4) : 0;
+        return $o != 0 ? $this->__string($this->__vector($o) + $j * 4) : array();
     }
 
     /**
@@ -392,7 +394,7 @@ class Monster extends Table
     }
 
     /**
-     * @returnVectorOffset
+     * @return VectorOffset
      */
     public function getTestarrayofsortedstruct($j)
     {
@@ -417,7 +419,7 @@ class Monster extends Table
     public function getFlex($j)
     {
         $o = $this->__offset(64);
-        return $o != 0 ? $this->bb->getByte($this->__vector($o) + $j * 1) : 0;
+        return $o != 0 ? $this->bb->getByte($this->__vector($o) + $j * 1) : array();
     }
 
     /**
@@ -438,7 +440,7 @@ class Monster extends Table
     }
 
     /**
-     * @returnVectorOffset
+     * @return VectorOffset
      */
     public function getTest5($j)
     {
@@ -463,7 +465,7 @@ class Monster extends Table
     public function getVectorOfLongs($j)
     {
         $o = $this->__offset(68);
-        return $o != 0 ? $this->bb->getLong($this->__vector($o) + $j * 8) : 0;
+        return $o != 0 ? $this->bb->getLong($this->__vector($o) + $j * 8) : array();
     }
 
     /**
@@ -482,7 +484,7 @@ class Monster extends Table
     public function getVectorOfDoubles($j)
     {
         $o = $this->__offset(70);
-        return $o != 0 ? $this->bb->getDouble($this->__vector($o) + $j * 8) : 0;
+        return $o != 0 ? $this->bb->getDouble($this->__vector($o) + $j * 8) : array();
     }
 
     /**
@@ -496,13 +498,13 @@ class Monster extends Table
 
     public function getParentNamespaceTest()
     {
-        $obj = new InParentNamespace();
+        $obj = new \MyGame\InParentNamespace();
         $o = $this->__offset(72);
-        return $o != 0 ? $obj->init($this->__indirect($o + $this->bb_pos), $this->bb) : 0;
+        return $o != 0 ? $obj->init($this->__indirect($o + $this->bb_pos), $this->bb) : null;
     }
 
     /**
-     * @returnVectorOffset
+     * @return VectorOffset
      */
     public function getVectorOfReferrables($j)
     {
@@ -536,7 +538,7 @@ class Monster extends Table
     public function getVectorOfWeakReferences($j)
     {
         $o = $this->__offset(78);
-        return $o != 0 ? $this->bb->getUlong($this->__vector($o) + $j * 8) : 0;
+        return $o != 0 ? $this->bb->getUlong($this->__vector($o) + $j * 8) : array();
     }
 
     /**
@@ -549,7 +551,7 @@ class Monster extends Table
     }
 
     /**
-     * @returnVectorOffset
+     * @return VectorOffset
      */
     public function getVectorOfStrongReferrables($j)
     {
@@ -583,7 +585,7 @@ class Monster extends Table
     public function getVectorOfCoOwningReferences($j)
     {
         $o = $this->__offset(84);
-        return $o != 0 ? $this->bb->getUlong($this->__vector($o) + $j * 8) : 0;
+        return $o != 0 ? $this->bb->getUlong($this->__vector($o) + $j * 8) : array();
     }
 
     /**
@@ -611,7 +613,7 @@ class Monster extends Table
     public function getVectorOfNonOwningReferences($j)
     {
         $o = $this->__offset(88);
-        return $o != 0 ? $this->bb->getUlong($this->__vector($o) + $j * 8) : 0;
+        return $o != 0 ? $this->bb->getUlong($this->__vector($o) + $j * 8) : array();
     }
 
     /**
@@ -633,7 +635,7 @@ class Monster extends Table
     }
 
     /**
-     * @returnint
+     * @return int
      */
     public function getAnyUnique($obj)
     {
@@ -651,7 +653,7 @@ class Monster extends Table
     }
 
     /**
-     * @returnint
+     * @return int
      */
     public function getAnyAmbiguous($obj)
     {
@@ -666,7 +668,7 @@ class Monster extends Table
     public function getVectorOfEnums($j)
     {
         $o = $this->__offset(98);
-        return $o != 0 ? $this->bb->getByte($this->__vector($o) + $j * 1) : 0;
+        return $o != 0 ? $this->bb->getByte($this->__vector($o) + $j * 1) : array();
     }
 
     /**
@@ -702,7 +704,7 @@ class Monster extends Table
     public function getTestrequirednestedflatbuffer($j)
     {
         $o = $this->__offset(102);
-        return $o != 0 ? $this->bb->getByte($this->__vector($o) + $j * 1) : 0;
+        return $o != 0 ? $this->bb->getByte($this->__vector($o) + $j * 1) : array();
     }
 
     /**
@@ -723,7 +725,7 @@ class Monster extends Table
     }
 
     /**
-     * @returnVectorOffset
+     * @return VectorOffset
      */
     public function getScalarKeySortedTables($j)
     {
@@ -743,9 +745,9 @@ class Monster extends Table
 
     public function getNativeInline()
     {
-        $obj = new Test();
+        $obj = new \MyGame\Example\Test();
         $o = $this->__offset(106);
-        return $o != 0 ? $obj->init($o + $this->bb_pos, $this->bb) : 0;
+        return $o != 0 ? $obj->init($o + $this->bb_pos, $this->bb) : null;
     }
 
     /**
@@ -772,7 +774,7 @@ class Monster extends Table
     public function getNanDefault()
     {
         $o = $this->__offset(112);
-        return $o != 0 ? $this->bb->getFloat($o + $this->bb_pos) : nan;
+        return $o != 0 ? $this->bb->getFloat($o + $this->bb_pos) : NAN;
     }
 
     /**
@@ -781,7 +783,7 @@ class Monster extends Table
     public function getInfDefault()
     {
         $o = $this->__offset(114);
-        return $o != 0 ? $this->bb->getFloat($o + $this->bb_pos) : inf;
+        return $o != 0 ? $this->bb->getFloat($o + $this->bb_pos) : INF;
     }
 
     /**
@@ -790,7 +792,7 @@ class Monster extends Table
     public function getPositiveInfDefault()
     {
         $o = $this->__offset(116);
-        return $o != 0 ? $this->bb->getFloat($o + $this->bb_pos) : +inf;
+        return $o != 0 ? $this->bb->getFloat($o + $this->bb_pos) : INF;
     }
 
     /**
@@ -799,7 +801,7 @@ class Monster extends Table
     public function getInfinityDefault()
     {
         $o = $this->__offset(118);
-        return $o != 0 ? $this->bb->getFloat($o + $this->bb_pos) : infinity;
+        return $o != 0 ? $this->bb->getFloat($o + $this->bb_pos) : INF;
     }
 
     /**
@@ -808,7 +810,7 @@ class Monster extends Table
     public function getPositiveInfinityDefault()
     {
         $o = $this->__offset(120);
-        return $o != 0 ? $this->bb->getFloat($o + $this->bb_pos) : +infinity;
+        return $o != 0 ? $this->bb->getFloat($o + $this->bb_pos) : INF;
     }
 
     /**
@@ -817,7 +819,7 @@ class Monster extends Table
     public function getNegativeInfDefault()
     {
         $o = $this->__offset(122);
-        return $o != 0 ? $this->bb->getFloat($o + $this->bb_pos) : -inf;
+        return $o != 0 ? $this->bb->getFloat($o + $this->bb_pos) : -INF;
     }
 
     /**
@@ -826,7 +828,7 @@ class Monster extends Table
     public function getNegativeInfinityDefault()
     {
         $o = $this->__offset(124);
-        return $o != 0 ? $this->bb->getFloat($o + $this->bb_pos) : -infinity;
+        return $o != 0 ? $this->bb->getFloat($o + $this->bb_pos) : -INF;
     }
 
     /**
@@ -835,7 +837,7 @@ class Monster extends Table
     public function getDoubleInfDefault()
     {
         $o = $this->__offset(126);
-        return $o != 0 ? $this->bb->getDouble($o + $this->bb_pos) : inf;
+        return $o != 0 ? $this->bb->getDouble($o + $this->bb_pos) : INF;
     }
 
     /**
@@ -844,7 +846,7 @@ class Monster extends Table
      */
     public static function startMonster(FlatBufferBuilder $builder)
     {
-        $builder->StartObject(62);
+        $builder->startObject(62);
     }
 
     /**
@@ -927,7 +929,7 @@ class Monster extends Table
      */
     public static function addPos(FlatBufferBuilder $builder, $pos)
     {
-        $builder->addStructX(0, $pos, 0);
+        $builder->addStructX(0, $pos, null);
     }
 
     /**
@@ -957,7 +959,7 @@ class Monster extends Table
      */
     public static function addName(FlatBufferBuilder $builder, $name)
     {
-        $builder->addOffsetX(3, $name, 0);
+        $builder->addOffsetX(3, $name, null);
     }
 
     /**
@@ -967,7 +969,7 @@ class Monster extends Table
      */
     public static function addInventory(FlatBufferBuilder $builder, $inventory)
     {
-        $builder->addOffsetX(5, $inventory, 0);
+        $builder->addOffsetX(5, $inventory, array());
     }
 
     /**
@@ -1001,7 +1003,7 @@ class Monster extends Table
      */
     public static function addColor(FlatBufferBuilder $builder, $color)
     {
-        $builder->addByteX(6, $color, 8);
+        $builder->addByteX(6, $color, \MyGame\Example\Color::Blue);
     }
 
     /**
@@ -1011,7 +1013,7 @@ class Monster extends Table
      */
     public static function addTestType(FlatBufferBuilder $builder, $testType)
     {
-        $builder->addByteX(7, $testType, 0);
+        $builder->addByteX(7, $testType, \MyGame\Example\Any::NONE);
     }
 
     public static function addTest(FlatBufferBuilder $builder, $offset)
@@ -1026,7 +1028,7 @@ class Monster extends Table
      */
     public static function addTest4(FlatBufferBuilder $builder, $test4)
     {
-        $builder->addOffsetX(9, $test4, 0);
+        $builder->addOffsetX(9, $test4, array());
     }
 
     /**
@@ -1060,7 +1062,7 @@ class Monster extends Table
      */
     public static function addTestarrayofstring(FlatBufferBuilder $builder, $testarrayofstring)
     {
-        $builder->addOffsetX(10, $testarrayofstring, 0);
+        $builder->addOffsetX(10, $testarrayofstring, array());
     }
 
     /**
@@ -1094,7 +1096,7 @@ class Monster extends Table
      */
     public static function addTestarrayoftables(FlatBufferBuilder $builder, $testarrayoftables)
     {
-        $builder->addOffsetX(11, $testarrayoftables, 0);
+        $builder->addOffsetX(11, $testarrayoftables, array());
     }
 
     /**
@@ -1128,7 +1130,7 @@ class Monster extends Table
      */
     public static function addEnemy(FlatBufferBuilder $builder, $enemy)
     {
-        $builder->addOffsetX(12, $enemy, 0);
+        $builder->addOffsetX(12, $enemy, null);
     }
 
     /**
@@ -1138,7 +1140,7 @@ class Monster extends Table
      */
     public static function addTestnestedflatbuffer(FlatBufferBuilder $builder, $testnestedflatbuffer)
     {
-        $builder->addOffsetX(13, $testnestedflatbuffer, 0);
+        $builder->addOffsetX(13, $testnestedflatbuffer, array());
     }
 
     /**
@@ -1172,7 +1174,7 @@ class Monster extends Table
      */
     public static function addTestempty(FlatBufferBuilder $builder, $testempty)
     {
-        $builder->addOffsetX(14, $testempty, 0);
+        $builder->addOffsetX(14, $testempty, null);
     }
 
     /**
@@ -1272,7 +1274,7 @@ class Monster extends Table
      */
     public static function addTestarrayofbools(FlatBufferBuilder $builder, $testarrayofbools)
     {
-        $builder->addOffsetX(24, $testarrayofbools, 0);
+        $builder->addOffsetX(24, $testarrayofbools, array());
     }
 
     /**
@@ -1336,7 +1338,7 @@ class Monster extends Table
      */
     public static function addTestarrayofstring2(FlatBufferBuilder $builder, $testarrayofstring2)
     {
-        $builder->addOffsetX(28, $testarrayofstring2, 0);
+        $builder->addOffsetX(28, $testarrayofstring2, array());
     }
 
     /**
@@ -1370,7 +1372,7 @@ class Monster extends Table
      */
     public static function addTestarrayofsortedstruct(FlatBufferBuilder $builder, $testarrayofsortedstruct)
     {
-        $builder->addOffsetX(29, $testarrayofsortedstruct, 0);
+        $builder->addOffsetX(29, $testarrayofsortedstruct, array());
     }
 
     /**
@@ -1404,7 +1406,7 @@ class Monster extends Table
      */
     public static function addFlex(FlatBufferBuilder $builder, $flex)
     {
-        $builder->addOffsetX(30, $flex, 0);
+        $builder->addOffsetX(30, $flex, array());
     }
 
     /**
@@ -1438,7 +1440,7 @@ class Monster extends Table
      */
     public static function addTest5(FlatBufferBuilder $builder, $test5)
     {
-        $builder->addOffsetX(31, $test5, 0);
+        $builder->addOffsetX(31, $test5, array());
     }
 
     /**
@@ -1472,7 +1474,7 @@ class Monster extends Table
      */
     public static function addVectorOfLongs(FlatBufferBuilder $builder, $vectorOfLongs)
     {
-        $builder->addOffsetX(32, $vectorOfLongs, 0);
+        $builder->addOffsetX(32, $vectorOfLongs, array());
     }
 
     /**
@@ -1506,7 +1508,7 @@ class Monster extends Table
      */
     public static function addVectorOfDoubles(FlatBufferBuilder $builder, $vectorOfDoubles)
     {
-        $builder->addOffsetX(33, $vectorOfDoubles, 0);
+        $builder->addOffsetX(33, $vectorOfDoubles, array());
     }
 
     /**
@@ -1540,7 +1542,7 @@ class Monster extends Table
      */
     public static function addParentNamespaceTest(FlatBufferBuilder $builder, $parentNamespaceTest)
     {
-        $builder->addOffsetX(34, $parentNamespaceTest, 0);
+        $builder->addOffsetX(34, $parentNamespaceTest, null);
     }
 
     /**
@@ -1550,7 +1552,7 @@ class Monster extends Table
      */
     public static function addVectorOfReferrables(FlatBufferBuilder $builder, $vectorOfReferrables)
     {
-        $builder->addOffsetX(35, $vectorOfReferrables, 0);
+        $builder->addOffsetX(35, $vectorOfReferrables, array());
     }
 
     /**
@@ -1594,7 +1596,7 @@ class Monster extends Table
      */
     public static function addVectorOfWeakReferences(FlatBufferBuilder $builder, $vectorOfWeakReferences)
     {
-        $builder->addOffsetX(37, $vectorOfWeakReferences, 0);
+        $builder->addOffsetX(37, $vectorOfWeakReferences, array());
     }
 
     /**
@@ -1628,7 +1630,7 @@ class Monster extends Table
      */
     public static function addVectorOfStrongReferrables(FlatBufferBuilder $builder, $vectorOfStrongReferrables)
     {
-        $builder->addOffsetX(38, $vectorOfStrongReferrables, 0);
+        $builder->addOffsetX(38, $vectorOfStrongReferrables, array());
     }
 
     /**
@@ -1672,7 +1674,7 @@ class Monster extends Table
      */
     public static function addVectorOfCoOwningReferences(FlatBufferBuilder $builder, $vectorOfCoOwningReferences)
     {
-        $builder->addOffsetX(40, $vectorOfCoOwningReferences, 0);
+        $builder->addOffsetX(40, $vectorOfCoOwningReferences, array());
     }
 
     /**
@@ -1716,7 +1718,7 @@ class Monster extends Table
      */
     public static function addVectorOfNonOwningReferences(FlatBufferBuilder $builder, $vectorOfNonOwningReferences)
     {
-        $builder->addOffsetX(42, $vectorOfNonOwningReferences, 0);
+        $builder->addOffsetX(42, $vectorOfNonOwningReferences, array());
     }
 
     /**
@@ -1750,7 +1752,7 @@ class Monster extends Table
      */
     public static function addAnyUniqueType(FlatBufferBuilder $builder, $anyUniqueType)
     {
-        $builder->addByteX(43, $anyUniqueType, 0);
+        $builder->addByteX(43, $anyUniqueType, \MyGame\Example\AnyUniqueAliases::NONE);
     }
 
     public static function addAnyUnique(FlatBufferBuilder $builder, $offset)
@@ -1765,7 +1767,7 @@ class Monster extends Table
      */
     public static function addAnyAmbiguousType(FlatBufferBuilder $builder, $anyAmbiguousType)
     {
-        $builder->addByteX(45, $anyAmbiguousType, 0);
+        $builder->addByteX(45, $anyAmbiguousType, \MyGame\Example\AnyAmbiguousAliases::NONE);
     }
 
     public static function addAnyAmbiguous(FlatBufferBuilder $builder, $offset)
@@ -1780,7 +1782,7 @@ class Monster extends Table
      */
     public static function addVectorOfEnums(FlatBufferBuilder $builder, $vectorOfEnums)
     {
-        $builder->addOffsetX(47, $vectorOfEnums, 0);
+        $builder->addOffsetX(47, $vectorOfEnums, array());
     }
 
     /**
@@ -1814,7 +1816,7 @@ class Monster extends Table
      */
     public static function addSignedEnum(FlatBufferBuilder $builder, $signedEnum)
     {
-        $builder->addSbyteX(48, $signedEnum, -1);
+        $builder->addSbyteX(48, $signedEnum, \MyGame\Example\Race::None);
     }
 
     /**
@@ -1824,7 +1826,7 @@ class Monster extends Table
      */
     public static function addTestrequirednestedflatbuffer(FlatBufferBuilder $builder, $testrequirednestedflatbuffer)
     {
-        $builder->addOffsetX(49, $testrequirednestedflatbuffer, 0);
+        $builder->addOffsetX(49, $testrequirednestedflatbuffer, array());
     }
 
     /**
@@ -1858,7 +1860,7 @@ class Monster extends Table
      */
     public static function addScalarKeySortedTables(FlatBufferBuilder $builder, $scalarKeySortedTables)
     {
-        $builder->addOffsetX(50, $scalarKeySortedTables, 0);
+        $builder->addOffsetX(50, $scalarKeySortedTables, array());
     }
 
     /**
@@ -1892,7 +1894,7 @@ class Monster extends Table
      */
     public static function addNativeInline(FlatBufferBuilder $builder, $nativeInline)
     {
-        $builder->addStructX(51, $nativeInline, 0);
+        $builder->addStructX(51, $nativeInline, null);
     }
 
     /**
@@ -1912,7 +1914,7 @@ class Monster extends Table
      */
     public static function addLongEnumNormalDefault(FlatBufferBuilder $builder, $longEnumNormalDefault)
     {
-        $builder->addUlongX(53, $longEnumNormalDefault, 2);
+        $builder->addUlongX(53, $longEnumNormalDefault, \MyGame\Example\LongEnum::LongOne);
     }
 
     /**
@@ -1922,7 +1924,7 @@ class Monster extends Table
      */
     public static function addNanDefault(FlatBufferBuilder $builder, $nanDefault)
     {
-        $builder->addFloatX(54, $nanDefault, nan);
+        $builder->addFloatX(54, $nanDefault, NAN);
     }
 
     /**
@@ -1932,7 +1934,7 @@ class Monster extends Table
      */
     public static function addInfDefault(FlatBufferBuilder $builder, $infDefault)
     {
-        $builder->addFloatX(55, $infDefault, inf);
+        $builder->addFloatX(55, $infDefault, INF);
     }
 
     /**
@@ -1942,7 +1944,7 @@ class Monster extends Table
      */
     public static function addPositiveInfDefault(FlatBufferBuilder $builder, $positiveInfDefault)
     {
-        $builder->addFloatX(56, $positiveInfDefault, +inf);
+        $builder->addFloatX(56, $positiveInfDefault, INF);
     }
 
     /**
@@ -1952,7 +1954,7 @@ class Monster extends Table
      */
     public static function addInfinityDefault(FlatBufferBuilder $builder, $infinityDefault)
     {
-        $builder->addFloatX(57, $infinityDefault, infinity);
+        $builder->addFloatX(57, $infinityDefault, INF);
     }
 
     /**
@@ -1962,7 +1964,7 @@ class Monster extends Table
      */
     public static function addPositiveInfinityDefault(FlatBufferBuilder $builder, $positiveInfinityDefault)
     {
-        $builder->addFloatX(58, $positiveInfinityDefault, +infinity);
+        $builder->addFloatX(58, $positiveInfinityDefault, INF);
     }
 
     /**
@@ -1972,7 +1974,7 @@ class Monster extends Table
      */
     public static function addNegativeInfDefault(FlatBufferBuilder $builder, $negativeInfDefault)
     {
-        $builder->addFloatX(59, $negativeInfDefault, -inf);
+        $builder->addFloatX(59, $negativeInfDefault, -INF);
     }
 
     /**
@@ -1982,7 +1984,7 @@ class Monster extends Table
      */
     public static function addNegativeInfinityDefault(FlatBufferBuilder $builder, $negativeInfinityDefault)
     {
-        $builder->addFloatX(60, $negativeInfinityDefault, -infinity);
+        $builder->addFloatX(60, $negativeInfinityDefault, -INF);
     }
 
     /**
@@ -1992,7 +1994,7 @@ class Monster extends Table
      */
     public static function addDoubleInfDefault(FlatBufferBuilder $builder, $doubleInfDefault)
     {
-        $builder->addDoubleX(61, $doubleInfDefault, inf);
+        $builder->addDoubleX(61, $doubleInfDefault, INF);
     }
 
     /**
@@ -2014,5 +2016,828 @@ class Monster extends Table
     public static function finishSizePrefixedMonsterBuffer(FlatBufferBuilder $builder, $offset)
     {
         $builder->finish($offset, "MONS", true);
+    }
+
+    /**
+     * @param MonsterT $o
+     */
+    public function unPackTo(&$o)
+    {
+        $pos = $this->getPos();
+        if ($pos !== null) {
+            $o->pos = $pos->unPack();
+        }
+        $o->mana = $this->getMana();
+        $o->hp = $this->getHp();
+        $o->name = $this->getName();
+        $o->inventory = $this->getInventoryBytes();
+        $o->color = $this->getColor();
+        $test = $this->getTestType();
+        if ($test !== null) {
+            $o->test = Any::unPack($test, array($this, 'getTest'));
+        }
+        $o->test4 = array();
+        $test4_len = $this->getTest4Length();
+        for ($i = 0; $i < $test4_len; $i++) {
+            array_push($o->test4, $this->getTest4($i)->unpack());
+        }
+        $o->testarrayofstring = array();
+        $testarrayofstring_len = $this->getTestarrayofstringLength();
+        for ($i = 0; $i < $testarrayofstring_len; $i++) {
+            array_push($o->testarrayofstring, $this->getTestarrayofstring($i));
+        }
+        $o->testarrayoftables = array();
+        $testarrayoftables_len = $this->getTestarrayoftablesLength();
+        for ($i = 0; $i < $testarrayoftables_len; $i++) {
+            array_push($o->testarrayoftables, $this->getTestarrayoftables($i)->unpack());
+        }
+        $enemy = $this->getEnemy();
+        if ($enemy !== null) {
+            $o->enemy = $enemy->unPack();
+        }
+        $o->testnestedflatbuffer = $this->getTestnestedflatbufferBytes();
+        $testempty = $this->getTestempty();
+        if ($testempty !== null) {
+            $o->testempty = $testempty->unPack();
+        }
+        $o->testbool = $this->getTestbool();
+        $o->testhashs32_fnv1 = $this->getTesthashs32Fnv1();
+        $o->testhashu32_fnv1 = $this->getTesthashu32Fnv1();
+        $o->testhashs64_fnv1 = $this->getTesthashs64Fnv1();
+        $o->testhashu64_fnv1 = $this->getTesthashu64Fnv1();
+        $o->testhashs32_fnv1a = $this->getTesthashs32Fnv1a();
+        $o->testhashu32_fnv1a = $this->getTesthashu32Fnv1a();
+        $o->testhashs64_fnv1a = $this->getTesthashs64Fnv1a();
+        $o->testhashu64_fnv1a = $this->getTesthashu64Fnv1a();
+        $o->testarrayofbools = array();
+        $testarrayofbools_len = $this->getTestarrayofboolsLength();
+        for ($i = 0; $i < $testarrayofbools_len; $i++) {
+            array_push($o->testarrayofbools, $this->getTestarrayofbools($i));
+        }
+        $o->testf = $this->getTestf();
+        $o->testf2 = $this->getTestf2();
+        $o->testf3 = $this->getTestf3();
+        $o->testarrayofstring2 = array();
+        $testarrayofstring2_len = $this->getTestarrayofstring2Length();
+        for ($i = 0; $i < $testarrayofstring2_len; $i++) {
+            array_push($o->testarrayofstring2, $this->getTestarrayofstring2($i));
+        }
+        $o->testarrayofsortedstruct = array();
+        $testarrayofsortedstruct_len = $this->getTestarrayofsortedstructLength();
+        for ($i = 0; $i < $testarrayofsortedstruct_len; $i++) {
+            array_push($o->testarrayofsortedstruct, $this->getTestarrayofsortedstruct($i)->unpack());
+        }
+        $o->flex = $this->getFlexBytes();
+        $o->test5 = array();
+        $test5_len = $this->getTest5Length();
+        for ($i = 0; $i < $test5_len; $i++) {
+            array_push($o->test5, $this->getTest5($i)->unpack());
+        }
+        $o->vector_of_longs = array();
+        $vector_of_longs_len = $this->getVectorOfLongsLength();
+        for ($i = 0; $i < $vector_of_longs_len; $i++) {
+            array_push($o->vector_of_longs, $this->getVectorOfLongs($i));
+        }
+        $o->vector_of_doubles = array();
+        $vector_of_doubles_len = $this->getVectorOfDoublesLength();
+        for ($i = 0; $i < $vector_of_doubles_len; $i++) {
+            array_push($o->vector_of_doubles, $this->getVectorOfDoubles($i));
+        }
+        $parent_namespace_test = $this->getParentNamespaceTest();
+        if ($parent_namespace_test !== null) {
+            $o->parent_namespace_test = $parent_namespace_test->unPack();
+        }
+        $o->vector_of_referrables = array();
+        $vector_of_referrables_len = $this->getVectorOfReferrablesLength();
+        for ($i = 0; $i < $vector_of_referrables_len; $i++) {
+            array_push($o->vector_of_referrables, $this->getVectorOfReferrables($i)->unpack());
+        }
+        $o->single_weak_reference = $this->getSingleWeakReference();
+        $o->vector_of_weak_references = array();
+        $vector_of_weak_references_len = $this->getVectorOfWeakReferencesLength();
+        for ($i = 0; $i < $vector_of_weak_references_len; $i++) {
+            array_push($o->vector_of_weak_references, $this->getVectorOfWeakReferences($i));
+        }
+        $o->vector_of_strong_referrables = array();
+        $vector_of_strong_referrables_len = $this->getVectorOfStrongReferrablesLength();
+        for ($i = 0; $i < $vector_of_strong_referrables_len; $i++) {
+            array_push($o->vector_of_strong_referrables, $this->getVectorOfStrongReferrables($i)->unpack());
+        }
+        $o->co_owning_reference = $this->getCoOwningReference();
+        $o->vector_of_co_owning_references = array();
+        $vector_of_co_owning_references_len = $this->getVectorOfCoOwningReferencesLength();
+        for ($i = 0; $i < $vector_of_co_owning_references_len; $i++) {
+            array_push($o->vector_of_co_owning_references, $this->getVectorOfCoOwningReferences($i));
+        }
+        $o->non_owning_reference = $this->getNonOwningReference();
+        $o->vector_of_non_owning_references = array();
+        $vector_of_non_owning_references_len = $this->getVectorOfNonOwningReferencesLength();
+        for ($i = 0; $i < $vector_of_non_owning_references_len; $i++) {
+            array_push($o->vector_of_non_owning_references, $this->getVectorOfNonOwningReferences($i));
+        }
+        $any_unique = $this->getAnyUniqueType();
+        if ($any_unique !== null) {
+            $o->any_unique = AnyUniqueAliases::unPack($any_unique, array($this, 'getAnyUnique'));
+        }
+        $any_ambiguous = $this->getAnyAmbiguousType();
+        if ($any_ambiguous !== null) {
+            $o->any_ambiguous = AnyAmbiguousAliases::unPack($any_ambiguous, array($this, 'getAnyAmbiguous'));
+        }
+        $o->vector_of_enums = $this->getVectorOfEnumsBytes();
+        $o->signed_enum = $this->getSignedEnum();
+        $o->testrequirednestedflatbuffer = $this->getTestrequirednestedflatbufferBytes();
+        $o->scalar_key_sorted_tables = array();
+        $scalar_key_sorted_tables_len = $this->getScalarKeySortedTablesLength();
+        for ($i = 0; $i < $scalar_key_sorted_tables_len; $i++) {
+            array_push($o->scalar_key_sorted_tables, $this->getScalarKeySortedTables($i)->unpack());
+        }
+        $native_inline = $this->getNativeInline();
+        if ($native_inline !== null) {
+            $o->native_inline = $native_inline->unPack();
+        }
+        $o->long_enum_non_enum_default = $this->getLongEnumNonEnumDefault();
+        $o->long_enum_normal_default = $this->getLongEnumNormalDefault();
+        $o->nan_default = $this->getNanDefault();
+        $o->inf_default = $this->getInfDefault();
+        $o->positive_inf_default = $this->getPositiveInfDefault();
+        $o->infinity_default = $this->getInfinityDefault();
+        $o->positive_infinity_default = $this->getPositiveInfinityDefault();
+        $o->negative_inf_default = $this->getNegativeInfDefault();
+        $o->negative_infinity_default = $this->getNegativeInfinityDefault();
+        $o->double_inf_default = $this->getDoubleInfDefault();
+    }
+
+    /**
+     * @return MonsterT
+     */
+    public function unPack()
+    {
+        $o = new MonsterT();
+        $this->unPackTo($o);
+        return $o;
+    }
+}
+
+class MonsterT implements IGeneratedObject
+{
+    /**
+     * @var Vec3T $pos
+     */
+    public $pos;
+
+    /**
+     * @var short $mana
+     */
+    public $mana;
+
+    /**
+     * @var short $hp
+     */
+    public $hp;
+
+    /**
+     * @var string $name
+     */
+    public $name;
+
+    /**
+     * @var array $inventory
+     */
+    public $inventory;
+
+    /**
+     * @var byte $color
+     */
+    public $color;
+
+    /**
+     * @var AnyT $test
+     */
+    public $test;
+
+    /**
+     * @var array $test4
+     */
+    public $test4;
+
+    /**
+     * @var array $testarrayofstring
+     */
+    public $testarrayofstring;
+
+    /**
+     * @var array $testarrayoftables
+     */
+    public $testarrayoftables;
+
+    /**
+     * @var MonsterT $enemy
+     */
+    public $enemy;
+
+    /**
+     * @var array $testnestedflatbuffer
+     */
+    public $testnestedflatbuffer;
+
+    /**
+     * @var StatT $testempty
+     */
+    public $testempty;
+
+    /**
+     * @var bool $testbool
+     */
+    public $testbool;
+
+    /**
+     * @var int $testhashs32_fnv1
+     */
+    public $testhashs32_fnv1;
+
+    /**
+     * @var uint $testhashu32_fnv1
+     */
+    public $testhashu32_fnv1;
+
+    /**
+     * @var long $testhashs64_fnv1
+     */
+    public $testhashs64_fnv1;
+
+    /**
+     * @var ulong $testhashu64_fnv1
+     */
+    public $testhashu64_fnv1;
+
+    /**
+     * @var int $testhashs32_fnv1a
+     */
+    public $testhashs32_fnv1a;
+
+    /**
+     * @var uint $testhashu32_fnv1a
+     */
+    public $testhashu32_fnv1a;
+
+    /**
+     * @var long $testhashs64_fnv1a
+     */
+    public $testhashs64_fnv1a;
+
+    /**
+     * @var ulong $testhashu64_fnv1a
+     */
+    public $testhashu64_fnv1a;
+
+    /**
+     * @var array $testarrayofbools
+     */
+    public $testarrayofbools;
+
+    /**
+     * @var float $testf
+     */
+    public $testf;
+
+    /**
+     * @var float $testf2
+     */
+    public $testf2;
+
+    /**
+     * @var float $testf3
+     */
+    public $testf3;
+
+    /**
+     * @var array $testarrayofstring2
+     */
+    public $testarrayofstring2;
+
+    /**
+     * @var array $testarrayofsortedstruct
+     */
+    public $testarrayofsortedstruct;
+
+    /**
+     * @var array $flex
+     */
+    public $flex;
+
+    /**
+     * @var array $test5
+     */
+    public $test5;
+
+    /**
+     * @var array $vector_of_longs
+     */
+    public $vector_of_longs;
+
+    /**
+     * @var array $vector_of_doubles
+     */
+    public $vector_of_doubles;
+
+    /**
+     * @var InParentNamespaceT $parent_namespace_test
+     */
+    public $parent_namespace_test;
+
+    /**
+     * @var array $vector_of_referrables
+     */
+    public $vector_of_referrables;
+
+    /**
+     * @var ulong $single_weak_reference
+     */
+    public $single_weak_reference;
+
+    /**
+     * @var array $vector_of_weak_references
+     */
+    public $vector_of_weak_references;
+
+    /**
+     * @var array $vector_of_strong_referrables
+     */
+    public $vector_of_strong_referrables;
+
+    /**
+     * @var ulong $co_owning_reference
+     */
+    public $co_owning_reference;
+
+    /**
+     * @var array $vector_of_co_owning_references
+     */
+    public $vector_of_co_owning_references;
+
+    /**
+     * @var ulong $non_owning_reference
+     */
+    public $non_owning_reference;
+
+    /**
+     * @var array $vector_of_non_owning_references
+     */
+    public $vector_of_non_owning_references;
+
+    /**
+     * @var AnyUniqueAliasesT $any_unique
+     */
+    public $any_unique;
+
+    /**
+     * @var AnyAmbiguousAliasesT $any_ambiguous
+     */
+    public $any_ambiguous;
+
+    /**
+     * @var array $vector_of_enums
+     */
+    public $vector_of_enums;
+
+    /**
+     * @var sbyte $signed_enum
+     */
+    public $signed_enum;
+
+    /**
+     * @var array $testrequirednestedflatbuffer
+     */
+    public $testrequirednestedflatbuffer;
+
+    /**
+     * @var array $scalar_key_sorted_tables
+     */
+    public $scalar_key_sorted_tables;
+
+    /**
+     * @var TestT $native_inline
+     */
+    public $native_inline;
+
+    /**
+     * @var ulong $long_enum_non_enum_default
+     */
+    public $long_enum_non_enum_default;
+
+    /**
+     * @var ulong $long_enum_normal_default
+     */
+    public $long_enum_normal_default;
+
+    /**
+     * @var float $nan_default
+     */
+    public $nan_default;
+
+    /**
+     * @var float $inf_default
+     */
+    public $inf_default;
+
+    /**
+     * @var float $positive_inf_default
+     */
+    public $positive_inf_default;
+
+    /**
+     * @var float $infinity_default
+     */
+    public $infinity_default;
+
+    /**
+     * @var float $positive_infinity_default
+     */
+    public $positive_infinity_default;
+
+    /**
+     * @var float $negative_inf_default
+     */
+    public $negative_inf_default;
+
+    /**
+     * @var float $negative_infinity_default
+     */
+    public $negative_infinity_default;
+
+    /**
+     * @var double $double_inf_default
+     */
+    public $double_inf_default;
+
+    /**
+     * @param Vec3T $pos
+     * @param short $mana
+     * @param short $hp
+     * @param string $name
+     * @param array $inventory
+     * @param byte $color
+     * @param AnyT $test
+     * @param array $test4
+     * @param array $testarrayofstring
+     * @param array $testarrayoftables
+     * @param MonsterT $enemy
+     * @param array $testnestedflatbuffer
+     * @param StatT $testempty
+     * @param bool $testbool
+     * @param int $testhashs32_fnv1
+     * @param uint $testhashu32_fnv1
+     * @param long $testhashs64_fnv1
+     * @param ulong $testhashu64_fnv1
+     * @param int $testhashs32_fnv1a
+     * @param uint $testhashu32_fnv1a
+     * @param long $testhashs64_fnv1a
+     * @param ulong $testhashu64_fnv1a
+     * @param array $testarrayofbools
+     * @param float $testf
+     * @param float $testf2
+     * @param float $testf3
+     * @param array $testarrayofstring2
+     * @param array $testarrayofsortedstruct
+     * @param array $flex
+     * @param array $test5
+     * @param array $vector_of_longs
+     * @param array $vector_of_doubles
+     * @param InParentNamespaceT $parent_namespace_test
+     * @param array $vector_of_referrables
+     * @param ulong $single_weak_reference
+     * @param array $vector_of_weak_references
+     * @param array $vector_of_strong_referrables
+     * @param ulong $co_owning_reference
+     * @param array $vector_of_co_owning_references
+     * @param ulong $non_owning_reference
+     * @param array $vector_of_non_owning_references
+     * @param AnyUniqueAliasesT $any_unique
+     * @param AnyAmbiguousAliasesT $any_ambiguous
+     * @param array $vector_of_enums
+     * @param sbyte $signed_enum
+     * @param array $testrequirednestedflatbuffer
+     * @param array $scalar_key_sorted_tables
+     * @param TestT $native_inline
+     * @param ulong $long_enum_non_enum_default
+     * @param ulong $long_enum_normal_default
+     * @param float $nan_default
+     * @param float $inf_default
+     * @param float $positive_inf_default
+     * @param float $infinity_default
+     * @param float $positive_infinity_default
+     * @param float $negative_inf_default
+     * @param float $negative_infinity_default
+     * @param double $double_inf_default
+     */
+    public function __construct($pos = null, $mana = 150, $hp = 100, $name = null, $inventory = "", $color = \MyGame\Example\Color::Blue, $test = null, $test4 = array(), $testarrayofstring = array(), $testarrayoftables = array(), $enemy = null, $testnestedflatbuffer = "", $testempty = null, $testbool = false, $testhashs32_fnv1 = 0, $testhashu32_fnv1 = 0, $testhashs64_fnv1 = 0, $testhashu64_fnv1 = 0, $testhashs32_fnv1a = 0, $testhashu32_fnv1a = 0, $testhashs64_fnv1a = 0, $testhashu64_fnv1a = 0, $testarrayofbools = array(), $testf = 3.14159, $testf2 = 3.0, $testf3 = 0.0, $testarrayofstring2 = array(), $testarrayofsortedstruct = array(), $flex = "", $test5 = array(), $vector_of_longs = array(), $vector_of_doubles = array(), $parent_namespace_test = null, $vector_of_referrables = array(), $single_weak_reference = 0, $vector_of_weak_references = array(), $vector_of_strong_referrables = array(), $co_owning_reference = 0, $vector_of_co_owning_references = array(), $non_owning_reference = 0, $vector_of_non_owning_references = array(), $any_unique = null, $any_ambiguous = null, $vector_of_enums = "", $signed_enum = \MyGame\Example\Race::None, $testrequirednestedflatbuffer = "", $scalar_key_sorted_tables = array(), $native_inline = null, $long_enum_non_enum_default = 0, $long_enum_normal_default = \MyGame\Example\LongEnum::LongOne, $nan_default = NAN, $inf_default = INF, $positive_inf_default = INF, $infinity_default = INF, $positive_infinity_default = INF, $negative_inf_default = -INF, $negative_infinity_default = -INF, $double_inf_default = INF)
+    {
+        $this->pos = $pos;
+        $this->mana = $mana;
+        $this->hp = $hp;
+        $this->name = $name;
+        $this->inventory = $inventory;
+        $this->color = $color;
+        $this->test = $test;
+        $this->test4 = $test4;
+        $this->testarrayofstring = $testarrayofstring;
+        $this->testarrayoftables = $testarrayoftables;
+        $this->enemy = $enemy;
+        $this->testnestedflatbuffer = $testnestedflatbuffer;
+        $this->testempty = $testempty;
+        $this->testbool = $testbool;
+        $this->testhashs32_fnv1 = $testhashs32_fnv1;
+        $this->testhashu32_fnv1 = $testhashu32_fnv1;
+        $this->testhashs64_fnv1 = $testhashs64_fnv1;
+        $this->testhashu64_fnv1 = $testhashu64_fnv1;
+        $this->testhashs32_fnv1a = $testhashs32_fnv1a;
+        $this->testhashu32_fnv1a = $testhashu32_fnv1a;
+        $this->testhashs64_fnv1a = $testhashs64_fnv1a;
+        $this->testhashu64_fnv1a = $testhashu64_fnv1a;
+        $this->testarrayofbools = $testarrayofbools;
+        $this->testf = $testf;
+        $this->testf2 = $testf2;
+        $this->testf3 = $testf3;
+        $this->testarrayofstring2 = $testarrayofstring2;
+        $this->testarrayofsortedstruct = $testarrayofsortedstruct;
+        $this->flex = $flex;
+        $this->test5 = $test5;
+        $this->vector_of_longs = $vector_of_longs;
+        $this->vector_of_doubles = $vector_of_doubles;
+        $this->parent_namespace_test = $parent_namespace_test;
+        $this->vector_of_referrables = $vector_of_referrables;
+        $this->single_weak_reference = $single_weak_reference;
+        $this->vector_of_weak_references = $vector_of_weak_references;
+        $this->vector_of_strong_referrables = $vector_of_strong_referrables;
+        $this->co_owning_reference = $co_owning_reference;
+        $this->vector_of_co_owning_references = $vector_of_co_owning_references;
+        $this->non_owning_reference = $non_owning_reference;
+        $this->vector_of_non_owning_references = $vector_of_non_owning_references;
+        $this->any_unique = $any_unique;
+        $this->any_ambiguous = $any_ambiguous;
+        $this->vector_of_enums = $vector_of_enums;
+        $this->signed_enum = $signed_enum;
+        $this->testrequirednestedflatbuffer = $testrequirednestedflatbuffer;
+        $this->scalar_key_sorted_tables = $scalar_key_sorted_tables;
+        $this->native_inline = $native_inline;
+        $this->long_enum_non_enum_default = $long_enum_non_enum_default;
+        $this->long_enum_normal_default = $long_enum_normal_default;
+        $this->nan_default = $nan_default;
+        $this->inf_default = $inf_default;
+        $this->positive_inf_default = $positive_inf_default;
+        $this->infinity_default = $infinity_default;
+        $this->positive_infinity_default = $positive_infinity_default;
+        $this->negative_inf_default = $negative_inf_default;
+        $this->negative_infinity_default = $negative_infinity_default;
+        $this->double_inf_default = $double_inf_default;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        if ($this->name !== null) {
+            $name = $builder->createString($this->name);
+        }
+        if ($this->inventory !== null) {
+            $inventory = $builder->createBytesVector($this->inventory);
+        }
+        if ($this->test !== null && $this->test->value !== null) {
+            $test = $this->test->value->pack($builder);
+        }
+        if ($this->test4 !== null) {
+            Monster::startTest4Vector($builder, count($this->test4));
+            for ($i = count($this->test4) - 1; $i >= 0; $i--) {
+                $this->test4[$i]->pack($builder);
+            }
+            $test4 = $builder->endVector();
+        }
+        if ($this->testarrayofstring !== null) {
+            $testarrayofstring_arr = array();
+            for ($i = 0; $i < count($this->testarrayofstring); $i++) {
+                array_push($testarrayofstring_arr, $builder->createString($this->testarrayofstring[$i]));
+            }
+            $testarrayofstring = Monster::createTestarrayofstringVector($builder, $testarrayofstring_arr);
+        }
+        if ($this->testarrayoftables !== null) {
+            $testarrayoftables_arr = array();
+            for ($i = 0; $i < count($this->testarrayoftables); $i++) {
+                array_push($testarrayoftables_arr, $this->testarrayoftables[i]->pack($builder));
+            }
+            $testarrayoftables = Monster::createTestarrayoftablesVector($builder, $testarrayoftables_arr);
+        }
+        if ($this->enemy !== null) {
+            $enemy = $this->enemy->pack($builder);
+        }
+        if ($this->testnestedflatbuffer !== null) {
+            $testnestedflatbuffer = $builder->createBytesVector($this->testnestedflatbuffer);
+        }
+        if ($this->testempty !== null) {
+            $testempty = $this->testempty->pack($builder);
+        }
+        if ($this->testarrayofbools !== null) {
+            $testarrayofbools = Monster::createTestarrayofboolsVector($builder, $this->testarrayofbools);
+        }
+        if ($this->testarrayofstring2 !== null) {
+            $testarrayofstring2_arr = array();
+            for ($i = 0; $i < count($this->testarrayofstring2); $i++) {
+                array_push($testarrayofstring2_arr, $builder->createString($this->testarrayofstring2[$i]));
+            }
+            $testarrayofstring2 = Monster::createTestarrayofstring2Vector($builder, $testarrayofstring2_arr);
+        }
+        if ($this->testarrayofsortedstruct !== null) {
+            Monster::startTestarrayofsortedstructVector($builder, count($this->testarrayofsortedstruct));
+            for ($i = count($this->testarrayofsortedstruct) - 1; $i >= 0; $i--) {
+                $this->testarrayofsortedstruct[$i]->pack($builder);
+            }
+            $testarrayofsortedstruct = $builder->endVector();
+        }
+        if ($this->flex !== null) {
+            $flex = $builder->createBytesVector($this->flex);
+        }
+        if ($this->test5 !== null) {
+            Monster::startTest5Vector($builder, count($this->test5));
+            for ($i = count($this->test5) - 1; $i >= 0; $i--) {
+                $this->test5[$i]->pack($builder);
+            }
+            $test5 = $builder->endVector();
+        }
+        if ($this->vector_of_longs !== null) {
+            $vector_of_longs = Monster::createVectorOfLongsVector($builder, $this->vector_of_longs);
+        }
+        if ($this->vector_of_doubles !== null) {
+            $vector_of_doubles = Monster::createVectorOfDoublesVector($builder, $this->vector_of_doubles);
+        }
+        if ($this->parent_namespace_test !== null) {
+            $parent_namespace_test = $this->parent_namespace_test->pack($builder);
+        }
+        if ($this->vector_of_referrables !== null) {
+            $vector_of_referrables_arr = array();
+            for ($i = 0; $i < count($this->vector_of_referrables); $i++) {
+                array_push($vector_of_referrables_arr, $this->vector_of_referrables[i]->pack($builder));
+            }
+            $vector_of_referrables = Monster::createVectorOfReferrablesVector($builder, $vector_of_referrables_arr);
+        }
+        if ($this->vector_of_weak_references !== null) {
+            $vector_of_weak_references = Monster::createVectorOfWeakReferencesVector($builder, $this->vector_of_weak_references);
+        }
+        if ($this->vector_of_strong_referrables !== null) {
+            $vector_of_strong_referrables_arr = array();
+            for ($i = 0; $i < count($this->vector_of_strong_referrables); $i++) {
+                array_push($vector_of_strong_referrables_arr, $this->vector_of_strong_referrables[i]->pack($builder));
+            }
+            $vector_of_strong_referrables = Monster::createVectorOfStrongReferrablesVector($builder, $vector_of_strong_referrables_arr);
+        }
+        if ($this->vector_of_co_owning_references !== null) {
+            $vector_of_co_owning_references = Monster::createVectorOfCoOwningReferencesVector($builder, $this->vector_of_co_owning_references);
+        }
+        if ($this->vector_of_non_owning_references !== null) {
+            $vector_of_non_owning_references = Monster::createVectorOfNonOwningReferencesVector($builder, $this->vector_of_non_owning_references);
+        }
+        if ($this->any_unique !== null && $this->any_unique->value !== null) {
+            $any_unique = $this->any_unique->value->pack($builder);
+        }
+        if ($this->any_ambiguous !== null && $this->any_ambiguous->value !== null) {
+            $any_ambiguous = $this->any_ambiguous->value->pack($builder);
+        }
+        if ($this->vector_of_enums !== null) {
+            $vector_of_enums = $builder->createBytesVector($this->vector_of_enums);
+        }
+        if ($this->testrequirednestedflatbuffer !== null) {
+            $testrequirednestedflatbuffer = $builder->createBytesVector($this->testrequirednestedflatbuffer);
+        }
+        if ($this->scalar_key_sorted_tables !== null) {
+            $scalar_key_sorted_tables_arr = array();
+            for ($i = 0; $i < count($this->scalar_key_sorted_tables); $i++) {
+                array_push($scalar_key_sorted_tables_arr, $this->scalar_key_sorted_tables[i]->pack($builder));
+            }
+            $scalar_key_sorted_tables = Monster::createScalarKeySortedTablesVector($builder, $scalar_key_sorted_tables_arr);
+        }
+        Monster::startMonster($builder);
+        if ($this->pos !== null) {
+            $pos = $this->pos->pack($builder);
+            Monster::addPos($builder, $pos);
+        }
+        Monster::addMana($builder, $this->mana);
+        Monster::addHp($builder, $this->hp);
+        if ($this->name !== null) {
+            Monster::addName($builder, $name);
+        }
+        if ($this->inventory !== null) {
+            Monster::addInventory($builder, $inventory);
+        }
+        Monster::addColor($builder, $this->color);
+        if ($this->test !== null && $this->test->type !== null) {
+            Monster::addTestType($builder, $this->test->type);
+            Monster::addTest($builder, $test);
+        }
+        if ($this->test4 !== null) {
+            Monster::addTest4($builder, $test4);
+        }
+        if ($this->testarrayofstring !== null) {
+            Monster::addTestarrayofstring($builder, $testarrayofstring);
+        }
+        if ($this->testarrayoftables !== null) {
+            Monster::addTestarrayoftables($builder, $testarrayoftables);
+        }
+        if ($this->enemy !== null) {
+            Monster::addEnemy($builder, $enemy);
+        }
+        if ($this->testnestedflatbuffer !== null) {
+            Monster::addTestnestedflatbuffer($builder, $testnestedflatbuffer);
+        }
+        if ($this->testempty !== null) {
+            Monster::addTestempty($builder, $testempty);
+        }
+        Monster::addTestbool($builder, $this->testbool);
+        Monster::addTesthashs32Fnv1($builder, $this->testhashs32_fnv1);
+        Monster::addTesthashu32Fnv1($builder, $this->testhashu32_fnv1);
+        Monster::addTesthashs64Fnv1($builder, $this->testhashs64_fnv1);
+        Monster::addTesthashu64Fnv1($builder, $this->testhashu64_fnv1);
+        Monster::addTesthashs32Fnv1a($builder, $this->testhashs32_fnv1a);
+        Monster::addTesthashu32Fnv1a($builder, $this->testhashu32_fnv1a);
+        Monster::addTesthashs64Fnv1a($builder, $this->testhashs64_fnv1a);
+        Monster::addTesthashu64Fnv1a($builder, $this->testhashu64_fnv1a);
+        if ($this->testarrayofbools !== null) {
+            Monster::addTestarrayofbools($builder, $testarrayofbools);
+        }
+        Monster::addTestf($builder, $this->testf);
+        Monster::addTestf2($builder, $this->testf2);
+        Monster::addTestf3($builder, $this->testf3);
+        if ($this->testarrayofstring2 !== null) {
+            Monster::addTestarrayofstring2($builder, $testarrayofstring2);
+        }
+        if ($this->testarrayofsortedstruct !== null) {
+            Monster::addTestarrayofsortedstruct($builder, $testarrayofsortedstruct);
+        }
+        if ($this->flex !== null) {
+            Monster::addFlex($builder, $flex);
+        }
+        if ($this->test5 !== null) {
+            Monster::addTest5($builder, $test5);
+        }
+        if ($this->vector_of_longs !== null) {
+            Monster::addVectorOfLongs($builder, $vector_of_longs);
+        }
+        if ($this->vector_of_doubles !== null) {
+            Monster::addVectorOfDoubles($builder, $vector_of_doubles);
+        }
+        if ($this->parent_namespace_test !== null) {
+            Monster::addParentNamespaceTest($builder, $parent_namespace_test);
+        }
+        if ($this->vector_of_referrables !== null) {
+            Monster::addVectorOfReferrables($builder, $vector_of_referrables);
+        }
+        Monster::addSingleWeakReference($builder, $this->single_weak_reference);
+        if ($this->vector_of_weak_references !== null) {
+            Monster::addVectorOfWeakReferences($builder, $vector_of_weak_references);
+        }
+        if ($this->vector_of_strong_referrables !== null) {
+            Monster::addVectorOfStrongReferrables($builder, $vector_of_strong_referrables);
+        }
+        Monster::addCoOwningReference($builder, $this->co_owning_reference);
+        if ($this->vector_of_co_owning_references !== null) {
+            Monster::addVectorOfCoOwningReferences($builder, $vector_of_co_owning_references);
+        }
+        Monster::addNonOwningReference($builder, $this->non_owning_reference);
+        if ($this->vector_of_non_owning_references !== null) {
+            Monster::addVectorOfNonOwningReferences($builder, $vector_of_non_owning_references);
+        }
+        if ($this->any_unique !== null && $this->any_unique->type !== null) {
+            Monster::addAnyUniqueType($builder, $this->any_unique->type);
+            Monster::addAnyUnique($builder, $any_unique);
+        }
+        if ($this->any_ambiguous !== null && $this->any_ambiguous->type !== null) {
+            Monster::addAnyAmbiguousType($builder, $this->any_ambiguous->type);
+            Monster::addAnyAmbiguous($builder, $any_ambiguous);
+        }
+        if ($this->vector_of_enums !== null) {
+            Monster::addVectorOfEnums($builder, $vector_of_enums);
+        }
+        Monster::addSignedEnum($builder, $this->signed_enum);
+        if ($this->testrequirednestedflatbuffer !== null) {
+            Monster::addTestrequirednestedflatbuffer($builder, $testrequirednestedflatbuffer);
+        }
+        if ($this->scalar_key_sorted_tables !== null) {
+            Monster::addScalarKeySortedTables($builder, $scalar_key_sorted_tables);
+        }
+        if ($this->native_inline !== null) {
+            $native_inline = $this->native_inline->pack($builder);
+            Monster::addNativeInline($builder, $native_inline);
+        }
+        Monster::addLongEnumNonEnumDefault($builder, $this->long_enum_non_enum_default);
+        Monster::addLongEnumNormalDefault($builder, $this->long_enum_normal_default);
+        Monster::addNanDefault($builder, $this->nan_default);
+        Monster::addInfDefault($builder, $this->inf_default);
+        Monster::addPositiveInfDefault($builder, $this->positive_inf_default);
+        Monster::addInfinityDefault($builder, $this->infinity_default);
+        Monster::addPositiveInfinityDefault($builder, $this->positive_infinity_default);
+        Monster::addNegativeInfDefault($builder, $this->negative_inf_default);
+        Monster::addNegativeInfinityDefault($builder, $this->negative_infinity_default);
+        Monster::addDoubleInfDefault($builder, $this->double_inf_default);
+        $monster = Monster::endMonster($builder);
+        return $monster;
     }
 }

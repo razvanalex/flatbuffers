@@ -8,8 +8,10 @@ use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
 use \Google\FlatBuffers\Constants;
+use \Google\FlatBuffers\IUnpackableObject;
+use \Google\FlatBuffers\IGeneratedObject;
 
-class Referrable extends Table
+class Referrable extends Table implements IUnpackableObject
 {
     /**
      * @param ByteBuffer $bb
@@ -74,7 +76,7 @@ class Referrable extends Table
      */
     public static function startReferrable(FlatBufferBuilder $builder)
     {
-        $builder->StartObject(1);
+        $builder->startObject(1);
     }
 
     /**
@@ -107,5 +109,51 @@ class Referrable extends Table
     {
         $o = $builder->endObject();
         return $o;
+    }
+
+    /**
+     * @param ReferrableT $o
+     */
+    public function unPackTo(&$o)
+    {
+        $o->id = $this->getId();
+    }
+
+    /**
+     * @return ReferrableT
+     */
+    public function unPack()
+    {
+        $o = new ReferrableT();
+        $this->unPackTo($o);
+        return $o;
+    }
+}
+
+class ReferrableT implements IGeneratedObject
+{
+    /**
+     * @var ulong $id
+     */
+    public $id;
+
+    /**
+     * @param ulong $id
+     */
+    public function __construct($id = 0)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        Referrable::startReferrable($builder);
+        Referrable::addId($builder, $this->id);
+        $referrable = Referrable::endReferrable($builder);
+        return $referrable;
     }
 }
