@@ -3,53 +3,6 @@
 
 use \Google\FlatBuffers\FlatBufferBuilder;
 
-class CharacterT
-{
-    /**
-     * @var Character $type
-     */
-    public $type;
-
-    /**
-     * @var mixed $value
-     */
-    public $value;
-
-    /**
-     * @param Character $type
-     * @param mixed $value
-     */
-    public function __construct($type, $value)
-    {
-        $this->type = $type;
-        $this->value = $value;
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        switch ($this->type) {
-            case Character::MuLan:
-                return $this->value->pack($builder);
-            case Character::Rapunzel:
-                return $this->value->pack($builder);
-            case Character::Belle:
-                return $this->value->pack($builder);
-            case Character::BookFan:
-                return $this->value->pack($builder);
-            case Character::Other:
-                return $this->value13;
-            case Character::Unused:
-                return $this->value13;
-            default:
-                return 0;
-        }
-    }
-}
-
 class Character
 {
     const NONE = 0;
@@ -104,6 +57,52 @@ class Character
                 return new CharacterT($union_type, $obj->unPack());
             default:
                 return null;
+        }
+    }
+}
+
+class CharacterT
+{
+    /**
+     * @var Character $type
+     */
+    public $type;
+
+    /**
+     * @var mixed $value
+     */
+    public $value;
+
+    /**
+     * @param Character $type
+     * @param mixed $value
+     */
+    public function __construct($type, $value)
+    {
+        $this->type = $type;
+        $this->value = $value;
+    }
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        switch ($this->type) {
+            case Character::MuLan:
+                return $this->value->pack($builder);
+            case Character::Rapunzel:
+                return $this->value->pack($builder);
+            case Character::Belle:
+                return $this->value->pack($builder);
+            case Character::BookFan:
+                return $this->value->pack($builder);
+            case Character::Other:
+                return $this->value13;
+            case Character::Unused:
+                return $this->value13;
+            default:
+                return 0;
         }
     }
 }

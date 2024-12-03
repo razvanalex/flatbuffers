@@ -11,314 +11,6 @@ use \Google\FlatBuffers\Constants;
 use \Google\FlatBuffers\IUnpackableObject;
 use \Google\FlatBuffers\IGeneratedObject;
 
-class ScalarStuffT implements IGeneratedObject
-{
-    /**
-     * @var sbyte $just_i8
-     */
-    public $just_i8;
-
-    /**
-     * @var sbyte $maybe_i8
-     */
-    public $maybe_i8;
-
-    /**
-     * @var sbyte $default_i8
-     */
-    public $default_i8;
-
-    /**
-     * @var byte $just_u8
-     */
-    public $just_u8;
-
-    /**
-     * @var byte $maybe_u8
-     */
-    public $maybe_u8;
-
-    /**
-     * @var byte $default_u8
-     */
-    public $default_u8;
-
-    /**
-     * @var short $just_i16
-     */
-    public $just_i16;
-
-    /**
-     * @var short $maybe_i16
-     */
-    public $maybe_i16;
-
-    /**
-     * @var short $default_i16
-     */
-    public $default_i16;
-
-    /**
-     * @var ushort $just_u16
-     */
-    public $just_u16;
-
-    /**
-     * @var ushort $maybe_u16
-     */
-    public $maybe_u16;
-
-    /**
-     * @var ushort $default_u16
-     */
-    public $default_u16;
-
-    /**
-     * @var int $just_i32
-     */
-    public $just_i32;
-
-    /**
-     * @var int $maybe_i32
-     */
-    public $maybe_i32;
-
-    /**
-     * @var int $default_i32
-     */
-    public $default_i32;
-
-    /**
-     * @var uint $just_u32
-     */
-    public $just_u32;
-
-    /**
-     * @var uint $maybe_u32
-     */
-    public $maybe_u32;
-
-    /**
-     * @var uint $default_u32
-     */
-    public $default_u32;
-
-    /**
-     * @var long $just_i64
-     */
-    public $just_i64;
-
-    /**
-     * @var long $maybe_i64
-     */
-    public $maybe_i64;
-
-    /**
-     * @var long $default_i64
-     */
-    public $default_i64;
-
-    /**
-     * @var ulong $just_u64
-     */
-    public $just_u64;
-
-    /**
-     * @var ulong $maybe_u64
-     */
-    public $maybe_u64;
-
-    /**
-     * @var ulong $default_u64
-     */
-    public $default_u64;
-
-    /**
-     * @var float $just_f32
-     */
-    public $just_f32;
-
-    /**
-     * @var float $maybe_f32
-     */
-    public $maybe_f32;
-
-    /**
-     * @var float $default_f32
-     */
-    public $default_f32;
-
-    /**
-     * @var double $just_f64
-     */
-    public $just_f64;
-
-    /**
-     * @var double $maybe_f64
-     */
-    public $maybe_f64;
-
-    /**
-     * @var double $default_f64
-     */
-    public $default_f64;
-
-    /**
-     * @var bool $just_bool
-     */
-    public $just_bool;
-
-    /**
-     * @var bool $maybe_bool
-     */
-    public $maybe_bool;
-
-    /**
-     * @var bool $default_bool
-     */
-    public $default_bool;
-
-    /**
-     * @var sbyte $just_enum
-     */
-    public $just_enum;
-
-    /**
-     * @var sbyte $maybe_enum
-     */
-    public $maybe_enum;
-
-    /**
-     * @var sbyte $default_enum
-     */
-    public $default_enum;
-
-    /**
-     * @param sbyte $just_i8
-     * @param sbyte $maybe_i8
-     * @param sbyte $default_i8
-     * @param byte $just_u8
-     * @param byte $maybe_u8
-     * @param byte $default_u8
-     * @param short $just_i16
-     * @param short $maybe_i16
-     * @param short $default_i16
-     * @param ushort $just_u16
-     * @param ushort $maybe_u16
-     * @param ushort $default_u16
-     * @param int $just_i32
-     * @param int $maybe_i32
-     * @param int $default_i32
-     * @param uint $just_u32
-     * @param uint $maybe_u32
-     * @param uint $default_u32
-     * @param long $just_i64
-     * @param long $maybe_i64
-     * @param long $default_i64
-     * @param ulong $just_u64
-     * @param ulong $maybe_u64
-     * @param ulong $default_u64
-     * @param float $just_f32
-     * @param float $maybe_f32
-     * @param float $default_f32
-     * @param double $just_f64
-     * @param double $maybe_f64
-     * @param double $default_f64
-     * @param bool $just_bool
-     * @param bool $maybe_bool
-     * @param bool $default_bool
-     * @param sbyte $just_enum
-     * @param sbyte $maybe_enum
-     * @param sbyte $default_enum
-     */
-    public function __construct($just_i8 = 0, $maybe_i8 = null, $default_i8 = 42, $just_u8 = 0, $maybe_u8 = null, $default_u8 = 42, $just_i16 = 0, $maybe_i16 = null, $default_i16 = 42, $just_u16 = 0, $maybe_u16 = null, $default_u16 = 42, $just_i32 = 0, $maybe_i32 = null, $default_i32 = 42, $just_u32 = 0, $maybe_u32 = null, $default_u32 = 42, $just_i64 = 0, $maybe_i64 = null, $default_i64 = 42, $just_u64 = 0, $maybe_u64 = null, $default_u64 = 42, $just_f32 = 0.0, $maybe_f32 = null, $default_f32 = 42.0, $just_f64 = 0.0, $maybe_f64 = null, $default_f64 = 42.0, $just_bool = false, $maybe_bool = null, $default_bool = true, $just_enum = \optional_scalars\OptionalByte::None, $maybe_enum = null, $default_enum = \optional_scalars\OptionalByte::One)
-    {
-        $this->just_i8 = $just_i8;
-        $this->maybe_i8 = $maybe_i8;
-        $this->default_i8 = $default_i8;
-        $this->just_u8 = $just_u8;
-        $this->maybe_u8 = $maybe_u8;
-        $this->default_u8 = $default_u8;
-        $this->just_i16 = $just_i16;
-        $this->maybe_i16 = $maybe_i16;
-        $this->default_i16 = $default_i16;
-        $this->just_u16 = $just_u16;
-        $this->maybe_u16 = $maybe_u16;
-        $this->default_u16 = $default_u16;
-        $this->just_i32 = $just_i32;
-        $this->maybe_i32 = $maybe_i32;
-        $this->default_i32 = $default_i32;
-        $this->just_u32 = $just_u32;
-        $this->maybe_u32 = $maybe_u32;
-        $this->default_u32 = $default_u32;
-        $this->just_i64 = $just_i64;
-        $this->maybe_i64 = $maybe_i64;
-        $this->default_i64 = $default_i64;
-        $this->just_u64 = $just_u64;
-        $this->maybe_u64 = $maybe_u64;
-        $this->default_u64 = $default_u64;
-        $this->just_f32 = $just_f32;
-        $this->maybe_f32 = $maybe_f32;
-        $this->default_f32 = $default_f32;
-        $this->just_f64 = $just_f64;
-        $this->maybe_f64 = $maybe_f64;
-        $this->default_f64 = $default_f64;
-        $this->just_bool = $just_bool;
-        $this->maybe_bool = $maybe_bool;
-        $this->default_bool = $default_bool;
-        $this->just_enum = $just_enum;
-        $this->maybe_enum = $maybe_enum;
-        $this->default_enum = $default_enum;
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        ScalarStuff::startScalarStuff($builder);
-        ScalarStuff::addJustI8($builder, $this->just_i8);
-        ScalarStuff::addMaybeI8($builder, $this->maybe_i8);
-        ScalarStuff::addDefaultI8($builder, $this->default_i8);
-        ScalarStuff::addJustU8($builder, $this->just_u8);
-        ScalarStuff::addMaybeU8($builder, $this->maybe_u8);
-        ScalarStuff::addDefaultU8($builder, $this->default_u8);
-        ScalarStuff::addJustI16($builder, $this->just_i16);
-        ScalarStuff::addMaybeI16($builder, $this->maybe_i16);
-        ScalarStuff::addDefaultI16($builder, $this->default_i16);
-        ScalarStuff::addJustU16($builder, $this->just_u16);
-        ScalarStuff::addMaybeU16($builder, $this->maybe_u16);
-        ScalarStuff::addDefaultU16($builder, $this->default_u16);
-        ScalarStuff::addJustI32($builder, $this->just_i32);
-        ScalarStuff::addMaybeI32($builder, $this->maybe_i32);
-        ScalarStuff::addDefaultI32($builder, $this->default_i32);
-        ScalarStuff::addJustU32($builder, $this->just_u32);
-        ScalarStuff::addMaybeU32($builder, $this->maybe_u32);
-        ScalarStuff::addDefaultU32($builder, $this->default_u32);
-        ScalarStuff::addJustI64($builder, $this->just_i64);
-        ScalarStuff::addMaybeI64($builder, $this->maybe_i64);
-        ScalarStuff::addDefaultI64($builder, $this->default_i64);
-        ScalarStuff::addJustU64($builder, $this->just_u64);
-        ScalarStuff::addMaybeU64($builder, $this->maybe_u64);
-        ScalarStuff::addDefaultU64($builder, $this->default_u64);
-        ScalarStuff::addJustF32($builder, $this->just_f32);
-        ScalarStuff::addMaybeF32($builder, $this->maybe_f32);
-        ScalarStuff::addDefaultF32($builder, $this->default_f32);
-        ScalarStuff::addJustF64($builder, $this->just_f64);
-        ScalarStuff::addMaybeF64($builder, $this->maybe_f64);
-        ScalarStuff::addDefaultF64($builder, $this->default_f64);
-        ScalarStuff::addJustBool($builder, $this->just_bool);
-        ScalarStuff::addMaybeBool($builder, $this->maybe_bool);
-        ScalarStuff::addDefaultBool($builder, $this->default_bool);
-        ScalarStuff::addJustEnum($builder, $this->just_enum);
-        ScalarStuff::addMaybeEnum($builder, $this->maybe_enum);
-        ScalarStuff::addDefaultEnum($builder, $this->default_enum);
-        $scalarStuff = ScalarStuff::endScalarStuff($builder);
-        return $scalarStuff;
-    }
-}
-
 class ScalarStuff extends Table implements IUnpackableObject
 {
     /**
@@ -1180,5 +872,313 @@ class ScalarStuff extends Table implements IUnpackableObject
         $o = new ScalarStuffT();
         $this->unPackTo($o);
         return $o;
+    }
+}
+
+class ScalarStuffT implements IGeneratedObject
+{
+    /**
+     * @var sbyte $just_i8
+     */
+    public $just_i8;
+
+    /**
+     * @var sbyte $maybe_i8
+     */
+    public $maybe_i8;
+
+    /**
+     * @var sbyte $default_i8
+     */
+    public $default_i8;
+
+    /**
+     * @var byte $just_u8
+     */
+    public $just_u8;
+
+    /**
+     * @var byte $maybe_u8
+     */
+    public $maybe_u8;
+
+    /**
+     * @var byte $default_u8
+     */
+    public $default_u8;
+
+    /**
+     * @var short $just_i16
+     */
+    public $just_i16;
+
+    /**
+     * @var short $maybe_i16
+     */
+    public $maybe_i16;
+
+    /**
+     * @var short $default_i16
+     */
+    public $default_i16;
+
+    /**
+     * @var ushort $just_u16
+     */
+    public $just_u16;
+
+    /**
+     * @var ushort $maybe_u16
+     */
+    public $maybe_u16;
+
+    /**
+     * @var ushort $default_u16
+     */
+    public $default_u16;
+
+    /**
+     * @var int $just_i32
+     */
+    public $just_i32;
+
+    /**
+     * @var int $maybe_i32
+     */
+    public $maybe_i32;
+
+    /**
+     * @var int $default_i32
+     */
+    public $default_i32;
+
+    /**
+     * @var uint $just_u32
+     */
+    public $just_u32;
+
+    /**
+     * @var uint $maybe_u32
+     */
+    public $maybe_u32;
+
+    /**
+     * @var uint $default_u32
+     */
+    public $default_u32;
+
+    /**
+     * @var long $just_i64
+     */
+    public $just_i64;
+
+    /**
+     * @var long $maybe_i64
+     */
+    public $maybe_i64;
+
+    /**
+     * @var long $default_i64
+     */
+    public $default_i64;
+
+    /**
+     * @var ulong $just_u64
+     */
+    public $just_u64;
+
+    /**
+     * @var ulong $maybe_u64
+     */
+    public $maybe_u64;
+
+    /**
+     * @var ulong $default_u64
+     */
+    public $default_u64;
+
+    /**
+     * @var float $just_f32
+     */
+    public $just_f32;
+
+    /**
+     * @var float $maybe_f32
+     */
+    public $maybe_f32;
+
+    /**
+     * @var float $default_f32
+     */
+    public $default_f32;
+
+    /**
+     * @var double $just_f64
+     */
+    public $just_f64;
+
+    /**
+     * @var double $maybe_f64
+     */
+    public $maybe_f64;
+
+    /**
+     * @var double $default_f64
+     */
+    public $default_f64;
+
+    /**
+     * @var bool $just_bool
+     */
+    public $just_bool;
+
+    /**
+     * @var bool $maybe_bool
+     */
+    public $maybe_bool;
+
+    /**
+     * @var bool $default_bool
+     */
+    public $default_bool;
+
+    /**
+     * @var sbyte $just_enum
+     */
+    public $just_enum;
+
+    /**
+     * @var sbyte $maybe_enum
+     */
+    public $maybe_enum;
+
+    /**
+     * @var sbyte $default_enum
+     */
+    public $default_enum;
+
+    /**
+     * @param sbyte $just_i8
+     * @param sbyte $maybe_i8
+     * @param sbyte $default_i8
+     * @param byte $just_u8
+     * @param byte $maybe_u8
+     * @param byte $default_u8
+     * @param short $just_i16
+     * @param short $maybe_i16
+     * @param short $default_i16
+     * @param ushort $just_u16
+     * @param ushort $maybe_u16
+     * @param ushort $default_u16
+     * @param int $just_i32
+     * @param int $maybe_i32
+     * @param int $default_i32
+     * @param uint $just_u32
+     * @param uint $maybe_u32
+     * @param uint $default_u32
+     * @param long $just_i64
+     * @param long $maybe_i64
+     * @param long $default_i64
+     * @param ulong $just_u64
+     * @param ulong $maybe_u64
+     * @param ulong $default_u64
+     * @param float $just_f32
+     * @param float $maybe_f32
+     * @param float $default_f32
+     * @param double $just_f64
+     * @param double $maybe_f64
+     * @param double $default_f64
+     * @param bool $just_bool
+     * @param bool $maybe_bool
+     * @param bool $default_bool
+     * @param sbyte $just_enum
+     * @param sbyte $maybe_enum
+     * @param sbyte $default_enum
+     */
+    public function __construct($just_i8 = 0, $maybe_i8 = null, $default_i8 = 42, $just_u8 = 0, $maybe_u8 = null, $default_u8 = 42, $just_i16 = 0, $maybe_i16 = null, $default_i16 = 42, $just_u16 = 0, $maybe_u16 = null, $default_u16 = 42, $just_i32 = 0, $maybe_i32 = null, $default_i32 = 42, $just_u32 = 0, $maybe_u32 = null, $default_u32 = 42, $just_i64 = 0, $maybe_i64 = null, $default_i64 = 42, $just_u64 = 0, $maybe_u64 = null, $default_u64 = 42, $just_f32 = 0.0, $maybe_f32 = null, $default_f32 = 42.0, $just_f64 = 0.0, $maybe_f64 = null, $default_f64 = 42.0, $just_bool = false, $maybe_bool = null, $default_bool = true, $just_enum = \optional_scalars\OptionalByte::None, $maybe_enum = null, $default_enum = \optional_scalars\OptionalByte::One)
+    {
+        $this->just_i8 = $just_i8;
+        $this->maybe_i8 = $maybe_i8;
+        $this->default_i8 = $default_i8;
+        $this->just_u8 = $just_u8;
+        $this->maybe_u8 = $maybe_u8;
+        $this->default_u8 = $default_u8;
+        $this->just_i16 = $just_i16;
+        $this->maybe_i16 = $maybe_i16;
+        $this->default_i16 = $default_i16;
+        $this->just_u16 = $just_u16;
+        $this->maybe_u16 = $maybe_u16;
+        $this->default_u16 = $default_u16;
+        $this->just_i32 = $just_i32;
+        $this->maybe_i32 = $maybe_i32;
+        $this->default_i32 = $default_i32;
+        $this->just_u32 = $just_u32;
+        $this->maybe_u32 = $maybe_u32;
+        $this->default_u32 = $default_u32;
+        $this->just_i64 = $just_i64;
+        $this->maybe_i64 = $maybe_i64;
+        $this->default_i64 = $default_i64;
+        $this->just_u64 = $just_u64;
+        $this->maybe_u64 = $maybe_u64;
+        $this->default_u64 = $default_u64;
+        $this->just_f32 = $just_f32;
+        $this->maybe_f32 = $maybe_f32;
+        $this->default_f32 = $default_f32;
+        $this->just_f64 = $just_f64;
+        $this->maybe_f64 = $maybe_f64;
+        $this->default_f64 = $default_f64;
+        $this->just_bool = $just_bool;
+        $this->maybe_bool = $maybe_bool;
+        $this->default_bool = $default_bool;
+        $this->just_enum = $just_enum;
+        $this->maybe_enum = $maybe_enum;
+        $this->default_enum = $default_enum;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        ScalarStuff::startScalarStuff($builder);
+        ScalarStuff::addJustI8($builder, $this->just_i8);
+        ScalarStuff::addMaybeI8($builder, $this->maybe_i8);
+        ScalarStuff::addDefaultI8($builder, $this->default_i8);
+        ScalarStuff::addJustU8($builder, $this->just_u8);
+        ScalarStuff::addMaybeU8($builder, $this->maybe_u8);
+        ScalarStuff::addDefaultU8($builder, $this->default_u8);
+        ScalarStuff::addJustI16($builder, $this->just_i16);
+        ScalarStuff::addMaybeI16($builder, $this->maybe_i16);
+        ScalarStuff::addDefaultI16($builder, $this->default_i16);
+        ScalarStuff::addJustU16($builder, $this->just_u16);
+        ScalarStuff::addMaybeU16($builder, $this->maybe_u16);
+        ScalarStuff::addDefaultU16($builder, $this->default_u16);
+        ScalarStuff::addJustI32($builder, $this->just_i32);
+        ScalarStuff::addMaybeI32($builder, $this->maybe_i32);
+        ScalarStuff::addDefaultI32($builder, $this->default_i32);
+        ScalarStuff::addJustU32($builder, $this->just_u32);
+        ScalarStuff::addMaybeU32($builder, $this->maybe_u32);
+        ScalarStuff::addDefaultU32($builder, $this->default_u32);
+        ScalarStuff::addJustI64($builder, $this->just_i64);
+        ScalarStuff::addMaybeI64($builder, $this->maybe_i64);
+        ScalarStuff::addDefaultI64($builder, $this->default_i64);
+        ScalarStuff::addJustU64($builder, $this->just_u64);
+        ScalarStuff::addMaybeU64($builder, $this->maybe_u64);
+        ScalarStuff::addDefaultU64($builder, $this->default_u64);
+        ScalarStuff::addJustF32($builder, $this->just_f32);
+        ScalarStuff::addMaybeF32($builder, $this->maybe_f32);
+        ScalarStuff::addDefaultF32($builder, $this->default_f32);
+        ScalarStuff::addJustF64($builder, $this->just_f64);
+        ScalarStuff::addMaybeF64($builder, $this->maybe_f64);
+        ScalarStuff::addDefaultF64($builder, $this->default_f64);
+        ScalarStuff::addJustBool($builder, $this->just_bool);
+        ScalarStuff::addMaybeBool($builder, $this->maybe_bool);
+        ScalarStuff::addDefaultBool($builder, $this->default_bool);
+        ScalarStuff::addJustEnum($builder, $this->just_enum);
+        ScalarStuff::addMaybeEnum($builder, $this->maybe_enum);
+        ScalarStuff::addDefaultEnum($builder, $this->default_enum);
+        $scalarStuff = ScalarStuff::endScalarStuff($builder);
+        return $scalarStuff;
     }
 }

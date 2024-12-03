@@ -11,31 +11,6 @@ use \Google\FlatBuffers\Constants;
 use \Google\FlatBuffers\IUnpackableObject;
 use \Google\FlatBuffers\IGeneratedObject;
 
-class StructOfStructsOfStructsT implements IGeneratedObject
-{
-    /**
-     * @var StructOfStructsT $a
-     */
-    public $a;
-
-    /**
-     * @param StructOfStructsT $a
-     */
-    public function __construct($a = null)
-    {
-        $this->a = $a;
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        return StructOfStructsOfStructs::createStructOfStructsOfStructs($builder, $this->a->a->id, $this->a->a->distance, $this->a->b->a, $this->a->b->b, $this->a->c->id, $this->a->c->distance);
-    }
-}
-
 class StructOfStructsOfStructs extends Struct implements IUnpackableObject
 {
     /**
@@ -100,5 +75,30 @@ class StructOfStructsOfStructs extends Struct implements IUnpackableObject
         $o = new StructOfStructsOfStructsT();
         $this->unPackTo($o);
         return $o;
+    }
+}
+
+class StructOfStructsOfStructsT implements IGeneratedObject
+{
+    /**
+     * @var StructOfStructsT $a
+     */
+    public $a;
+
+    /**
+     * @param StructOfStructsT $a
+     */
+    public function __construct($a = null)
+    {
+        $this->a = $a;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        return StructOfStructsOfStructs::createStructOfStructsOfStructs($builder, $this->a->a->id, $this->a->a->distance, $this->a->b->a, $this->a->b->b, $this->a->c->id, $this->a->c->distance);
     }
 }

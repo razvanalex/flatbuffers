@@ -9,34 +9,6 @@ use \Google\FlatBuffers\Constants;
 use \Google\FlatBuffers\IUnpackableObject;
 use \Google\FlatBuffers\IGeneratedObject;
 
-class HandFanT implements IGeneratedObject
-{
-    /**
-     * @var int $length
-     */
-    public $length;
-
-    /**
-     * @param int $length
-     */
-    public function __construct($length = 0)
-    {
-        $this->length = $length;
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        HandFan::startHandFan($builder);
-        HandFan::addLength($builder, $this->length);
-        $handFan = HandFan::endHandFan($builder);
-        return $handFan;
-    }
-}
-
 class HandFan extends Table implements IUnpackableObject
 {
     /**
@@ -148,5 +120,33 @@ class HandFan extends Table implements IUnpackableObject
         $o = new HandFanT();
         $this->unPackTo($o);
         return $o;
+    }
+}
+
+class HandFanT implements IGeneratedObject
+{
+    /**
+     * @var int $length
+     */
+    public $length;
+
+    /**
+     * @param int $length
+     */
+    public function __construct($length = 0)
+    {
+        $this->length = $length;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        HandFan::startHandFan($builder);
+        HandFan::addLength($builder, $this->length);
+        $handFan = HandFan::endHandFan($builder);
+        return $handFan;
     }
 }

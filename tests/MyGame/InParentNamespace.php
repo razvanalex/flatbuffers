@@ -11,24 +11,6 @@ use \Google\FlatBuffers\Constants;
 use \Google\FlatBuffers\IUnpackableObject;
 use \Google\FlatBuffers\IGeneratedObject;
 
-class InParentNamespaceT implements IGeneratedObject
-{
-    public function __construct()
-    {
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        InParentNamespace::startInParentNamespace($builder);
-        $inParentNamespace = InParentNamespace::endInParentNamespace($builder);
-        return $inParentNamespace;
-    }
-}
-
 class InParentNamespace extends Table implements IUnpackableObject
 {
     /**
@@ -124,5 +106,23 @@ class InParentNamespace extends Table implements IUnpackableObject
         $o = new InParentNamespaceT();
         $this->unPackTo($o);
         return $o;
+    }
+}
+
+class InParentNamespaceT implements IGeneratedObject
+{
+    public function __construct()
+    {
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        InParentNamespace::startInParentNamespace($builder);
+        $inParentNamespace = InParentNamespace::endInParentNamespace($builder);
+        return $inParentNamespace;
     }
 }

@@ -11,38 +11,6 @@ use \Google\FlatBuffers\Constants;
 use \Google\FlatBuffers\IUnpackableObject;
 use \Google\FlatBuffers\IGeneratedObject;
 
-class TestT implements IGeneratedObject
-{
-    /**
-     * @var short $a
-     */
-    public $a;
-
-    /**
-     * @var sbyte $b
-     */
-    public $b;
-
-    /**
-     * @param short $a
-     * @param sbyte $b
-     */
-    public function __construct($a = 0, $b = 0)
-    {
-        $this->a = $a;
-        $this->b = $b;
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        return Test::createTest($builder, $this->a, $this->b);
-    }
-}
-
 class Test extends Struct implements IUnpackableObject
 {
     /**
@@ -103,5 +71,37 @@ class Test extends Struct implements IUnpackableObject
         $o = new TestT();
         $this->unPackTo($o);
         return $o;
+    }
+}
+
+class TestT implements IGeneratedObject
+{
+    /**
+     * @var short $a
+     */
+    public $a;
+
+    /**
+     * @var sbyte $b
+     */
+    public $b;
+
+    /**
+     * @param short $a
+     * @param sbyte $b
+     */
+    public function __construct($a = 0, $b = 0)
+    {
+        $this->a = $a;
+        $this->b = $b;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        return Test::createTest($builder, $this->a, $this->b);
     }
 }

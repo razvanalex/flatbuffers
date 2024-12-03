@@ -11,66 +11,6 @@ use \Google\FlatBuffers\Constants;
 use \Google\FlatBuffers\IUnpackableObject;
 use \Google\FlatBuffers\IGeneratedObject;
 
-class Vec3T implements IGeneratedObject
-{
-    /**
-     * @var float $x
-     */
-    public $x;
-
-    /**
-     * @var float $y
-     */
-    public $y;
-
-    /**
-     * @var float $z
-     */
-    public $z;
-
-    /**
-     * @var double $test1
-     */
-    public $test1;
-
-    /**
-     * @var byte $test2
-     */
-    public $test2;
-
-    /**
-     * @var TestT $test3
-     */
-    public $test3;
-
-    /**
-     * @param float $x
-     * @param float $y
-     * @param float $z
-     * @param double $test1
-     * @param byte $test2
-     * @param TestT $test3
-     */
-    public function __construct($x = 0.0, $y = 0.0, $z = 0.0, $test1 = 0.0, $test2 = 0, $test3 = null)
-    {
-        $this->x = $x;
-        $this->y = $y;
-        $this->z = $z;
-        $this->test1 = $test1;
-        $this->test2 = $test2;
-        $this->test3 = $test3;
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        return Vec3::createVec3($builder, $this->x, $this->y, $this->z, $this->test1, $this->test2, $this->test3->a, $this->test3->b);
-    }
-}
-
 class Vec3 extends Struct implements IUnpackableObject
 {
     /**
@@ -181,5 +121,65 @@ class Vec3 extends Struct implements IUnpackableObject
         $o = new Vec3T();
         $this->unPackTo($o);
         return $o;
+    }
+}
+
+class Vec3T implements IGeneratedObject
+{
+    /**
+     * @var float $x
+     */
+    public $x;
+
+    /**
+     * @var float $y
+     */
+    public $y;
+
+    /**
+     * @var float $z
+     */
+    public $z;
+
+    /**
+     * @var double $test1
+     */
+    public $test1;
+
+    /**
+     * @var byte $test2
+     */
+    public $test2;
+
+    /**
+     * @var TestT $test3
+     */
+    public $test3;
+
+    /**
+     * @param float $x
+     * @param float $y
+     * @param float $z
+     * @param double $test1
+     * @param byte $test2
+     * @param TestT $test3
+     */
+    public function __construct($x = 0.0, $y = 0.0, $z = 0.0, $test1 = 0.0, $test2 = 0, $test3 = null)
+    {
+        $this->x = $x;
+        $this->y = $y;
+        $this->z = $z;
+        $this->test1 = $test1;
+        $this->test2 = $test2;
+        $this->test3 = $test3;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        return Vec3::createVec3($builder, $this->x, $this->y, $this->z, $this->test1, $this->test2, $this->test3->a, $this->test3->b);
     }
 }

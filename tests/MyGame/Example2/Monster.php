@@ -11,24 +11,6 @@ use \Google\FlatBuffers\Constants;
 use \Google\FlatBuffers\IUnpackableObject;
 use \Google\FlatBuffers\IGeneratedObject;
 
-class MonsterT implements IGeneratedObject
-{
-    public function __construct()
-    {
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        Monster::startMonster($builder);
-        $monster = Monster::endMonster($builder);
-        return $monster;
-    }
-}
-
 class Monster extends Table implements IUnpackableObject
 {
     /**
@@ -124,5 +106,23 @@ class Monster extends Table implements IUnpackableObject
         $o = new MonsterT();
         $this->unPackTo($o);
         return $o;
+    }
+}
+
+class MonsterT implements IGeneratedObject
+{
+    public function __construct()
+    {
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        Monster::startMonster($builder);
+        $monster = Monster::endMonster($builder);
+        return $monster;
     }
 }

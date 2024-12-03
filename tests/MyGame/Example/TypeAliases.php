@@ -11,132 +11,6 @@ use \Google\FlatBuffers\Constants;
 use \Google\FlatBuffers\IUnpackableObject;
 use \Google\FlatBuffers\IGeneratedObject;
 
-class TypeAliasesT implements IGeneratedObject
-{
-    /**
-     * @var sbyte $i8
-     */
-    public $i8;
-
-    /**
-     * @var byte $u8
-     */
-    public $u8;
-
-    /**
-     * @var short $i16
-     */
-    public $i16;
-
-    /**
-     * @var ushort $u16
-     */
-    public $u16;
-
-    /**
-     * @var int $i32
-     */
-    public $i32;
-
-    /**
-     * @var uint $u32
-     */
-    public $u32;
-
-    /**
-     * @var long $i64
-     */
-    public $i64;
-
-    /**
-     * @var ulong $u64
-     */
-    public $u64;
-
-    /**
-     * @var float $f32
-     */
-    public $f32;
-
-    /**
-     * @var double $f64
-     */
-    public $f64;
-
-    /**
-     * @var array $v8
-     */
-    public $v8;
-
-    /**
-     * @var array $vf64
-     */
-    public $vf64;
-
-    /**
-     * @param sbyte $i8
-     * @param byte $u8
-     * @param short $i16
-     * @param ushort $u16
-     * @param int $i32
-     * @param uint $u32
-     * @param long $i64
-     * @param ulong $u64
-     * @param float $f32
-     * @param double $f64
-     * @param array $v8
-     * @param array $vf64
-     */
-    public function __construct($i8 = 0, $u8 = 0, $i16 = 0, $u16 = 0, $i32 = 0, $u32 = 0, $i64 = 0, $u64 = 0, $f32 = 0.0, $f64 = 0.0, $v8 = array(), $vf64 = array())
-    {
-        $this->i8 = $i8;
-        $this->u8 = $u8;
-        $this->i16 = $i16;
-        $this->u16 = $u16;
-        $this->i32 = $i32;
-        $this->u32 = $u32;
-        $this->i64 = $i64;
-        $this->u64 = $u64;
-        $this->f32 = $f32;
-        $this->f64 = $f64;
-        $this->v8 = $v8;
-        $this->vf64 = $vf64;
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        if ($this->v8 !== null) {
-            $v8 = TypeAliases::createV8Vector($builder, $this->v8);
-        }
-        if ($this->vf64 !== null) {
-            $vf64 = TypeAliases::createVf64Vector($builder, $this->vf64);
-        }
-        TypeAliases::startTypeAliases($builder);
-        TypeAliases::addI8($builder, $this->i8);
-        TypeAliases::addU8($builder, $this->u8);
-        TypeAliases::addI16($builder, $this->i16);
-        TypeAliases::addU16($builder, $this->u16);
-        TypeAliases::addI32($builder, $this->i32);
-        TypeAliases::addU32($builder, $this->u32);
-        TypeAliases::addI64($builder, $this->i64);
-        TypeAliases::addU64($builder, $this->u64);
-        TypeAliases::addF32($builder, $this->f32);
-        TypeAliases::addF64($builder, $this->f64);
-        if ($this->v8 !== null) {
-            TypeAliases::addV8($builder, $v8);
-        }
-        if ($this->vf64 !== null) {
-            TypeAliases::addVf64($builder, $vf64);
-        }
-        $typeAliases = TypeAliases::endTypeAliases($builder);
-        return $typeAliases;
-    }
-}
-
 class TypeAliases extends Table implements IUnpackableObject
 {
     /**
@@ -560,5 +434,131 @@ class TypeAliases extends Table implements IUnpackableObject
         $o = new TypeAliasesT();
         $this->unPackTo($o);
         return $o;
+    }
+}
+
+class TypeAliasesT implements IGeneratedObject
+{
+    /**
+     * @var sbyte $i8
+     */
+    public $i8;
+
+    /**
+     * @var byte $u8
+     */
+    public $u8;
+
+    /**
+     * @var short $i16
+     */
+    public $i16;
+
+    /**
+     * @var ushort $u16
+     */
+    public $u16;
+
+    /**
+     * @var int $i32
+     */
+    public $i32;
+
+    /**
+     * @var uint $u32
+     */
+    public $u32;
+
+    /**
+     * @var long $i64
+     */
+    public $i64;
+
+    /**
+     * @var ulong $u64
+     */
+    public $u64;
+
+    /**
+     * @var float $f32
+     */
+    public $f32;
+
+    /**
+     * @var double $f64
+     */
+    public $f64;
+
+    /**
+     * @var array $v8
+     */
+    public $v8;
+
+    /**
+     * @var array $vf64
+     */
+    public $vf64;
+
+    /**
+     * @param sbyte $i8
+     * @param byte $u8
+     * @param short $i16
+     * @param ushort $u16
+     * @param int $i32
+     * @param uint $u32
+     * @param long $i64
+     * @param ulong $u64
+     * @param float $f32
+     * @param double $f64
+     * @param array $v8
+     * @param array $vf64
+     */
+    public function __construct($i8 = 0, $u8 = 0, $i16 = 0, $u16 = 0, $i32 = 0, $u32 = 0, $i64 = 0, $u64 = 0, $f32 = 0.0, $f64 = 0.0, $v8 = array(), $vf64 = array())
+    {
+        $this->i8 = $i8;
+        $this->u8 = $u8;
+        $this->i16 = $i16;
+        $this->u16 = $u16;
+        $this->i32 = $i32;
+        $this->u32 = $u32;
+        $this->i64 = $i64;
+        $this->u64 = $u64;
+        $this->f32 = $f32;
+        $this->f64 = $f64;
+        $this->v8 = $v8;
+        $this->vf64 = $vf64;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        if ($this->v8 !== null) {
+            $v8 = TypeAliases::createV8Vector($builder, $this->v8);
+        }
+        if ($this->vf64 !== null) {
+            $vf64 = TypeAliases::createVf64Vector($builder, $this->vf64);
+        }
+        TypeAliases::startTypeAliases($builder);
+        TypeAliases::addI8($builder, $this->i8);
+        TypeAliases::addU8($builder, $this->u8);
+        TypeAliases::addI16($builder, $this->i16);
+        TypeAliases::addU16($builder, $this->u16);
+        TypeAliases::addI32($builder, $this->i32);
+        TypeAliases::addU32($builder, $this->u32);
+        TypeAliases::addI64($builder, $this->i64);
+        TypeAliases::addU64($builder, $this->u64);
+        TypeAliases::addF32($builder, $this->f32);
+        TypeAliases::addF64($builder, $this->f64);
+        if ($this->v8 !== null) {
+            TypeAliases::addV8($builder, $v8);
+        }
+        if ($this->vf64 !== null) {
+            TypeAliases::addVf64($builder, $vf64);
+        }
+        $typeAliases = TypeAliases::endTypeAliases($builder);
+        return $typeAliases;
     }
 }

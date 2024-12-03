@@ -354,9 +354,6 @@ class PhpGenerator : public BaseGenerator {
       GenPackForStruct(struct_def, code_ptr);
     }
     EndClass(code_ptr);
-
-    std::string &code = *code_ptr;
-    code += "\n";
   }
 
   void GenConstructorForObjectAPI(const StructDef& struct_def,
@@ -431,9 +428,10 @@ class PhpGenerator : public BaseGenerator {
     code += "\n";
   }
 
-  void BeginClassForObjectAPI(const StructDef &struct_def,
-                              std::string *code_ptr) {
-    auto &code = *code_ptr;
+  void BeginClassForObjectAPI(const StructDef& struct_def,
+                              std::string* code_ptr) {
+    auto& code = *code_ptr;
+    code += "\n";
     code += "class " + namer_.ObjectType(struct_def) +
             " implements IGeneratedObject\n";
     code += "{\n";
@@ -764,8 +762,8 @@ class PhpGenerator : public BaseGenerator {
           break;
       }
     }
-    code += Indent + Indent + struct_var + " = " + struct_type +
-            "::" + "end" + struct_type + "($builder);\n";
+    code += Indent + Indent + struct_var + " = " + struct_type + "::" + "end" +
+            struct_type + "($builder);\n";
     code += Indent + Indent + "return " + struct_var + ";\n";
     code += Indent + "}\n";
 
@@ -791,19 +789,17 @@ class PhpGenerator : public BaseGenerator {
   }
 
   void GenNativeUnion(const EnumDef& enum_def, std::string* code_ptr) {
-    std::string& code = *code_ptr;
-
     GenNativeUnionClass(enum_def, code_ptr);
     GenNativeUnionPack(enum_def, code_ptr);
     EndClass(code_ptr);
-    code += "\n";
   }
 
-  void GenNativeUnionClass(const EnumDef &enum_def, std::string *code_ptr) {
-    std::string &code = *code_ptr;
+  void GenNativeUnionClass(const EnumDef& enum_def, std::string* code_ptr) {
+    std::string& code = *code_ptr;
     const std::string type = namer_.Type(enum_def);
     const std::string union_type = namer_.ObjectType(enum_def);
 
+    code += "\n";
     code += "class " + union_type + "\n";
     code += "{\n";
     code += Indent + "/**\n";
@@ -825,11 +821,10 @@ class PhpGenerator : public BaseGenerator {
     code += Indent + Indent + "$this->type = $type;\n";
     code += Indent + Indent + "$this->value = $value;\n";
     code += Indent + "}\n";
-    code += "\n";
   }
 
-  void GenNativeUnionPack(const EnumDef &enum_def, std::string *code_ptr) {
-    std::string &code = *code_ptr;
+  void GenNativeUnionPack(const EnumDef& enum_def, std::string* code_ptr) {
+    std::string& code = *code_ptr;
     const std::string type = namer_.Type(enum_def);
     const std::string union_type = namer_.ObjectType(enum_def);
 
@@ -1624,9 +1619,6 @@ class PhpGenerator : public BaseGenerator {
   void GenStruct(const StructDef& struct_def, std::string* code_ptr) {
     if (struct_def.generated) return;
 
-    if (parser_.opts.generate_object_based_api) {
-      GenNativeStruct(struct_def, code_ptr);
-    }
     GenComment(struct_def.doc_comment, code_ptr, nullptr);
     BeginClass(struct_def, code_ptr);
 
@@ -1692,6 +1684,10 @@ class PhpGenerator : public BaseGenerator {
       GenNativeUnpack(struct_def, code_ptr);
     }
     EndClass(code_ptr);
+
+    if (parser_.opts.generate_object_based_api) {
+      GenNativeStruct(struct_def, code_ptr);
+    }
   }
 
   // Generate enum declarations.
@@ -1703,7 +1699,6 @@ class PhpGenerator : public BaseGenerator {
     if (enum_def.is_union && parser_.opts.generate_object_based_api) {
       code += "use \\Google\\FlatBuffers\\FlatBufferBuilder;\n";
       code += "\n";
-      GenNativeUnion(enum_def, code_ptr);
     }
 
     GenComment(enum_def.doc_comment, code_ptr, nullptr);
@@ -1735,6 +1730,10 @@ class PhpGenerator : public BaseGenerator {
       GenNativeUnionUnPack(enum_def, code_ptr);
     }
     EndEnum(code_ptr);
+
+    if (enum_def.is_union && parser_.opts.generate_object_based_api) {
+      GenNativeUnion(enum_def, code_ptr);
+    }
   }
 
   // Returns the function name that is able to read a value of the given type.

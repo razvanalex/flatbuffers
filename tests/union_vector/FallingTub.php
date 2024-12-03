@@ -9,31 +9,6 @@ use \Google\FlatBuffers\Constants;
 use \Google\FlatBuffers\IUnpackableObject;
 use \Google\FlatBuffers\IGeneratedObject;
 
-class FallingTubT implements IGeneratedObject
-{
-    /**
-     * @var int $weight
-     */
-    public $weight;
-
-    /**
-     * @param int $weight
-     */
-    public function __construct($weight = 0)
-    {
-        $this->weight = $weight;
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        return FallingTub::createFallingTub($builder, $this->weight);
-    }
-}
-
 class FallingTub extends Struct implements IUnpackableObject
 {
     /**
@@ -83,5 +58,30 @@ class FallingTub extends Struct implements IUnpackableObject
         $o = new FallingTubT();
         $this->unPackTo($o);
         return $o;
+    }
+}
+
+class FallingTubT implements IGeneratedObject
+{
+    /**
+     * @var int $weight
+     */
+    public $weight;
+
+    /**
+     * @param int $weight
+     */
+    public function __construct($weight = 0)
+    {
+        $this->weight = $weight;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        return FallingTub::createFallingTub($builder, $this->weight);
     }
 }
