@@ -138,7 +138,9 @@ static std::set<std::string> PhpKeywords() {
           "never",
           "enum",
           "resource",
-          "numeric"};
+          "numeric",
+          "self",
+          "parent"};
 }
 
 namespace php {
