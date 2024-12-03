@@ -11,38 +11,6 @@ use \Google\FlatBuffers\Constants;
 use \Google\FlatBuffers\IUnpackableObject;
 use \Google\FlatBuffers\IGeneratedObject;
 
-class AbilityT implements IGeneratedObject
-{
-    /**
-     * @var uint $id
-     */
-    public $id;
-
-    /**
-     * @var uint $distance
-     */
-    public $distance;
-
-    /**
-     * @param uint $id
-     * @param uint $distance
-     */
-    public function __construct($id = 0, $distance = 0)
-    {
-        $this->id = $id;
-        $this->distance = $distance;
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        return Ability::createAbility($builder, $this->id, $this->distance);
-    }
-}
-
 class Ability extends Struct implements IUnpackableObject
 {
     /**
@@ -102,5 +70,37 @@ class Ability extends Struct implements IUnpackableObject
         $o = new AbilityT();
         $this->unPackTo($o);
         return $o;
+    }
+}
+
+class AbilityT implements IGeneratedObject
+{
+    /**
+     * @var uint $id
+     */
+    public $id;
+
+    /**
+     * @var uint $distance
+     */
+    public $distance;
+
+    /**
+     * @param uint $id
+     * @param uint $distance
+     */
+    public function __construct($id = 0, $distance = 0)
+    {
+        $this->id = $id;
+        $this->distance = $distance;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        return Ability::createAbility($builder, $this->id, $this->distance);
     }
 }

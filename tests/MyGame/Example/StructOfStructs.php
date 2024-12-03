@@ -11,45 +11,6 @@ use \Google\FlatBuffers\Constants;
 use \Google\FlatBuffers\IUnpackableObject;
 use \Google\FlatBuffers\IGeneratedObject;
 
-class StructOfStructsT implements IGeneratedObject
-{
-    /**
-     * @var AbilityT $a
-     */
-    public $a;
-
-    /**
-     * @var TestT $b
-     */
-    public $b;
-
-    /**
-     * @var AbilityT $c
-     */
-    public $c;
-
-    /**
-     * @param AbilityT $a
-     * @param TestT $b
-     * @param AbilityT $c
-     */
-    public function __construct($a = null, $b = null, $c = null)
-    {
-        $this->a = $a;
-        $this->b = $b;
-        $this->c = $c;
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        return StructOfStructs::createStructOfStructs($builder, $this->a->id, $this->a->distance, $this->b->a, $this->b->b, $this->c->id, $this->c->distance);
-    }
-}
-
 class StructOfStructs extends Struct implements IUnpackableObject
 {
     /**
@@ -141,5 +102,44 @@ class StructOfStructs extends Struct implements IUnpackableObject
         $o = new StructOfStructsT();
         $this->unPackTo($o);
         return $o;
+    }
+}
+
+class StructOfStructsT implements IGeneratedObject
+{
+    /**
+     * @var AbilityT $a
+     */
+    public $a;
+
+    /**
+     * @var TestT $b
+     */
+    public $b;
+
+    /**
+     * @var AbilityT $c
+     */
+    public $c;
+
+    /**
+     * @param AbilityT $a
+     * @param TestT $b
+     * @param AbilityT $c
+     */
+    public function __construct($a = null, $b = null, $c = null)
+    {
+        $this->a = $a;
+        $this->b = $b;
+        $this->c = $c;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        return StructOfStructs::createStructOfStructs($builder, $this->a->id, $this->a->distance, $this->b->a, $this->b->b, $this->c->id, $this->c->distance);
     }
 }

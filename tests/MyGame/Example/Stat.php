@@ -11,55 +11,6 @@ use \Google\FlatBuffers\Constants;
 use \Google\FlatBuffers\IUnpackableObject;
 use \Google\FlatBuffers\IGeneratedObject;
 
-class StatT implements IGeneratedObject
-{
-    /**
-     * @var string $id
-     */
-    public $id;
-
-    /**
-     * @var long $val
-     */
-    public $val;
-
-    /**
-     * @var ushort $count
-     */
-    public $count;
-
-    /**
-     * @param string $id
-     * @param long $val
-     * @param ushort $count
-     */
-    public function __construct($id = null, $val = 0, $count = 0)
-    {
-        $this->id = $id;
-        $this->val = $val;
-        $this->count = $count;
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        if ($this->id !== null) {
-            $id = $builder->createString($this->id);
-        }
-        Stat::startStat($builder);
-        if ($this->id !== null) {
-            Stat::addId($builder, $id);
-        }
-        Stat::addVal($builder, $this->val);
-        Stat::addCount($builder, $this->count);
-        $stat = Stat::endStat($builder);
-        return $stat;
-    }
-}
-
 class Stat extends Table implements IUnpackableObject
 {
     /**
@@ -215,5 +166,54 @@ class Stat extends Table implements IUnpackableObject
         $o = new StatT();
         $this->unPackTo($o);
         return $o;
+    }
+}
+
+class StatT implements IGeneratedObject
+{
+    /**
+     * @var string $id
+     */
+    public $id;
+
+    /**
+     * @var long $val
+     */
+    public $val;
+
+    /**
+     * @var ushort $count
+     */
+    public $count;
+
+    /**
+     * @param string $id
+     * @param long $val
+     * @param ushort $count
+     */
+    public function __construct($id = null, $val = 0, $count = 0)
+    {
+        $this->id = $id;
+        $this->val = $val;
+        $this->count = $count;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        if ($this->id !== null) {
+            $id = $builder->createString($this->id);
+        }
+        Stat::startStat($builder);
+        if ($this->id !== null) {
+            Stat::addId($builder, $id);
+        }
+        Stat::addVal($builder, $this->val);
+        Stat::addCount($builder, $this->count);
+        $stat = Stat::endStat($builder);
+        return $stat;
     }
 }

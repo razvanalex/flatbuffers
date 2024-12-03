@@ -9,66 +9,6 @@ use \Google\FlatBuffers\Constants;
 use \Google\FlatBuffers\IUnpackableObject;
 use \Google\FlatBuffers\IGeneratedObject;
 
-class MovieT implements IGeneratedObject
-{
-    /**
-     * @var CharacterT $main_character
-     */
-    public $main_character;
-
-    /**
-     * @var CharacterT $characters_type
-     */
-    public $characters_type;
-
-    /**
-     * @var CharacterT $characters
-     */
-    public $characters;
-
-    /**
-     * @param CharacterT $main_character
-     * @param CharacterT $characters_type
-     * @param CharacterT $characters
-     */
-    public function __construct($main_character = null, $characters_type = null, $characters = null)
-    {
-        $this->main_character = $main_character;
-        $this->characters_type = $characters_type;
-        $this->characters = $characters;
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        if ($this->main_character !== null && $this->main_character->value !== null) {
-            $main_character = $this->main_character->value->pack($builder);
-        }
-        if ($this->characters_type !== null) {
-            $characters_type = Movie::createCharactersTypeVector($builder, $this->characters_type);
-        }
-        if ($this->characters !== null) {
-            $characters = Movie::createCharactersVector($builder, $this->characters);
-        }
-        Movie::startMovie($builder);
-        if ($this->main_character !== null && $this->main_character->type !== null) {
-            Movie::addMainCharacterType($builder, $this->main_character->type);
-            Movie::addMainCharacter($builder, $main_character);
-        }
-        if ($this->characters_type !== null) {
-            Movie::addCharactersType($builder, $characters_type);
-        }
-        if ($this->characters !== null) {
-            Movie::addCharacters($builder, $characters);
-        }
-        $movie = Movie::endMovie($builder);
-        return $movie;
-    }
-}
-
 class Movie extends Table implements IUnpackableObject
 {
     /**
@@ -326,5 +266,65 @@ class Movie extends Table implements IUnpackableObject
         $o = new MovieT();
         $this->unPackTo($o);
         return $o;
+    }
+}
+
+class MovieT implements IGeneratedObject
+{
+    /**
+     * @var CharacterT $main_character
+     */
+    public $main_character;
+
+    /**
+     * @var CharacterT $characters_type
+     */
+    public $characters_type;
+
+    /**
+     * @var CharacterT $characters
+     */
+    public $characters;
+
+    /**
+     * @param CharacterT $main_character
+     * @param CharacterT $characters_type
+     * @param CharacterT $characters
+     */
+    public function __construct($main_character = null, $characters_type = null, $characters = null)
+    {
+        $this->main_character = $main_character;
+        $this->characters_type = $characters_type;
+        $this->characters = $characters;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        if ($this->main_character !== null && $this->main_character->value !== null) {
+            $main_character = $this->main_character->value->pack($builder);
+        }
+        if ($this->characters_type !== null) {
+            $characters_type = Movie::createCharactersTypeVector($builder, $this->characters_type);
+        }
+        if ($this->characters !== null) {
+            $characters = Movie::createCharactersVector($builder, $this->characters);
+        }
+        Movie::startMovie($builder);
+        if ($this->main_character !== null && $this->main_character->type !== null) {
+            Movie::addMainCharacterType($builder, $this->main_character->type);
+            Movie::addMainCharacter($builder, $main_character);
+        }
+        if ($this->characters_type !== null) {
+            Movie::addCharactersType($builder, $characters_type);
+        }
+        if ($this->characters !== null) {
+            Movie::addCharacters($builder, $characters);
+        }
+        $movie = Movie::endMovie($builder);
+        return $movie;
     }
 }

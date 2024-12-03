@@ -9,31 +9,6 @@ use \Google\FlatBuffers\Constants;
 use \Google\FlatBuffers\IUnpackableObject;
 use \Google\FlatBuffers\IGeneratedObject;
 
-class BookReaderT implements IGeneratedObject
-{
-    /**
-     * @var int $books_read
-     */
-    public $books_read;
-
-    /**
-     * @param int $books_read
-     */
-    public function __construct($books_read = 0)
-    {
-        $this->books_read = $books_read;
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        return BookReader::createBookReader($builder, $this->booksRead);
-    }
-}
-
 class BookReader extends Struct implements IUnpackableObject
 {
     /**
@@ -83,5 +58,30 @@ class BookReader extends Struct implements IUnpackableObject
         $o = new BookReaderT();
         $this->unPackTo($o);
         return $o;
+    }
+}
+
+class BookReaderT implements IGeneratedObject
+{
+    /**
+     * @var int $books_read
+     */
+    public $books_read;
+
+    /**
+     * @param int $books_read
+     */
+    public function __construct($books_read = 0)
+    {
+        $this->books_read = $books_read;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        return BookReader::createBookReader($builder, $this->booksRead);
     }
 }

@@ -3,45 +3,6 @@
 
 use \Google\FlatBuffers\FlatBufferBuilder;
 
-class GadgetT
-{
-    /**
-     * @var Gadget $type
-     */
-    public $type;
-
-    /**
-     * @var mixed $value
-     */
-    public $value;
-
-    /**
-     * @param Gadget $type
-     * @param mixed $value
-     */
-    public function __construct($type, $value)
-    {
-        $this->type = $type;
-        $this->value = $value;
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        switch ($this->type) {
-            case Gadget::FallingTub:
-                return $this->value->pack($builder);
-            case Gadget::HandFan:
-                return $this->value->pack($builder);
-            default:
-                return 0;
-        }
-    }
-}
-
 class Gadget
 {
     const NONE = 0;
@@ -76,6 +37,44 @@ class Gadget
                 return new GadgetT($union_type, $obj->unPack());
             default:
                 return null;
+        }
+    }
+}
+
+class GadgetT
+{
+    /**
+     * @var Gadget $type
+     */
+    public $type;
+
+    /**
+     * @var mixed $value
+     */
+    public $value;
+
+    /**
+     * @param Gadget $type
+     * @param mixed $value
+     */
+    public function __construct($type, $value)
+    {
+        $this->type = $type;
+        $this->value = $value;
+    }
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        switch ($this->type) {
+            case Gadget::FallingTub:
+                return $this->value->pack($builder);
+            case Gadget::HandFan:
+                return $this->value->pack($builder);
+            default:
+                return 0;
         }
     }
 }

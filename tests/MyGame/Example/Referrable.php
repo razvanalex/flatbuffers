@@ -11,34 +11,6 @@ use \Google\FlatBuffers\Constants;
 use \Google\FlatBuffers\IUnpackableObject;
 use \Google\FlatBuffers\IGeneratedObject;
 
-class ReferrableT implements IGeneratedObject
-{
-    /**
-     * @var ulong $id
-     */
-    public $id;
-
-    /**
-     * @param ulong $id
-     */
-    public function __construct($id = 0)
-    {
-        $this->id = $id;
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        Referrable::startReferrable($builder);
-        Referrable::addId($builder, $this->id);
-        $referrable = Referrable::endReferrable($builder);
-        return $referrable;
-    }
-}
-
 class Referrable extends Table implements IUnpackableObject
 {
     /**
@@ -155,5 +127,33 @@ class Referrable extends Table implements IUnpackableObject
         $o = new ReferrableT();
         $this->unPackTo($o);
         return $o;
+    }
+}
+
+class ReferrableT implements IGeneratedObject
+{
+    /**
+     * @var ulong $id
+     */
+    public $id;
+
+    /**
+     * @param ulong $id
+     */
+    public function __construct($id = 0)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        Referrable::startReferrable($builder);
+        Referrable::addId($builder, $this->id);
+        $referrable = Referrable::endReferrable($builder);
+        return $referrable;
     }
 }

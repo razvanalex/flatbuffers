@@ -11,34 +11,6 @@ use \Google\FlatBuffers\Constants;
 use \Google\FlatBuffers\IUnpackableObject;
 use \Google\FlatBuffers\IGeneratedObject;
 
-class TestSimpleTableWithEnumT implements IGeneratedObject
-{
-    /**
-     * @var byte $color
-     */
-    public $color;
-
-    /**
-     * @param byte $color
-     */
-    public function __construct($color = \MyGame\Example\Color::Green)
-    {
-        $this->color = $color;
-    }
-
-    /**
-     * @param FlatBufferBuilder $builder
-     * @return int offset
-     */
-    public function pack(FlatBufferBuilder $builder)
-    {
-        TestSimpleTableWithEnum::startTestSimpleTableWithEnum($builder);
-        TestSimpleTableWithEnum::addColor($builder, $this->color);
-        $testSimpleTableWithEnum = TestSimpleTableWithEnum::endTestSimpleTableWithEnum($builder);
-        return $testSimpleTableWithEnum;
-    }
-}
-
 class TestSimpleTableWithEnum extends Table implements IUnpackableObject
 {
     /**
@@ -155,5 +127,33 @@ class TestSimpleTableWithEnum extends Table implements IUnpackableObject
         $o = new TestSimpleTableWithEnumT();
         $this->unPackTo($o);
         return $o;
+    }
+}
+
+class TestSimpleTableWithEnumT implements IGeneratedObject
+{
+    /**
+     * @var byte $color
+     */
+    public $color;
+
+    /**
+     * @param byte $color
+     */
+    public function __construct($color = \MyGame\Example\Color::Green)
+    {
+        $this->color = $color;
+    }
+
+    /**
+     * @param FlatBufferBuilder $builder
+     * @return int offset
+     */
+    public function pack(FlatBufferBuilder $builder)
+    {
+        TestSimpleTableWithEnum::startTestSimpleTableWithEnum($builder);
+        TestSimpleTableWithEnum::addColor($builder, $this->color);
+        $testSimpleTableWithEnum = TestSimpleTableWithEnum::endTestSimpleTableWithEnum($builder);
+        return $testSimpleTableWithEnum;
     }
 }
