@@ -540,7 +540,7 @@ class PhpGenerator : public BaseGenerator {
       code_prefix += "for ($i = 0; $i < count(" + field_this + "); $i++) {\n";
       code_prefix += Indent + Indent + Indent + Indent;
       code_prefix += "array_push(" + field_arr + ", " + field_this +
-                     "[i]->pack($builder));\n";
+                     "[$i]->pack($builder));\n";
       code_prefix += Indent + Indent + Indent;
       code_prefix += "}\n";
       code_prefix += Indent + Indent + Indent;
