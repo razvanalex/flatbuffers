@@ -2624,7 +2624,7 @@ class MonsterT implements IGeneratedObject
         if ($this->testarrayoftables !== null) {
             $testarrayoftables_arr = array();
             for ($i = 0; $i < count($this->testarrayoftables); $i++) {
-                array_push($testarrayoftables_arr, $this->testarrayoftables[i]->pack($builder));
+                array_push($testarrayoftables_arr, $this->testarrayoftables[$i]->pack($builder));
             }
             $testarrayoftables = Monster::createTestarrayoftablesVector($builder, $testarrayoftables_arr);
         }
@@ -2676,7 +2676,7 @@ class MonsterT implements IGeneratedObject
         if ($this->vector_of_referrables !== null) {
             $vector_of_referrables_arr = array();
             for ($i = 0; $i < count($this->vector_of_referrables); $i++) {
-                array_push($vector_of_referrables_arr, $this->vector_of_referrables[i]->pack($builder));
+                array_push($vector_of_referrables_arr, $this->vector_of_referrables[$i]->pack($builder));
             }
             $vector_of_referrables = Monster::createVectorOfReferrablesVector($builder, $vector_of_referrables_arr);
         }
@@ -2686,7 +2686,7 @@ class MonsterT implements IGeneratedObject
         if ($this->vector_of_strong_referrables !== null) {
             $vector_of_strong_referrables_arr = array();
             for ($i = 0; $i < count($this->vector_of_strong_referrables); $i++) {
-                array_push($vector_of_strong_referrables_arr, $this->vector_of_strong_referrables[i]->pack($builder));
+                array_push($vector_of_strong_referrables_arr, $this->vector_of_strong_referrables[$i]->pack($builder));
             }
             $vector_of_strong_referrables = Monster::createVectorOfStrongReferrablesVector($builder, $vector_of_strong_referrables_arr);
         }
@@ -2711,7 +2711,7 @@ class MonsterT implements IGeneratedObject
         if ($this->scalar_key_sorted_tables !== null) {
             $scalar_key_sorted_tables_arr = array();
             for ($i = 0; $i < count($this->scalar_key_sorted_tables); $i++) {
-                array_push($scalar_key_sorted_tables_arr, $this->scalar_key_sorted_tables[i]->pack($builder));
+                array_push($scalar_key_sorted_tables_arr, $this->scalar_key_sorted_tables[$i]->pack($builder));
             }
             $scalar_key_sorted_tables = Monster::createScalarKeySortedTablesVector($builder, $scalar_key_sorted_tables_arr);
         }
