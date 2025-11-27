@@ -7,6 +7,7 @@ use \Google\FlatBuffers\Struct;
 use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
+use \Google\FlatBuffers\Constants;
 
 class Universe extends Table
 {
@@ -17,7 +18,18 @@ class Universe extends Table
     public static function getRootAsUniverse(ByteBuffer $bb)
     {
         $obj = new Universe();
-        return ($obj->init($bb->getInt($bb->getPosition()) + $bb->getPosition(), $bb));
+        return $obj->init($bb->getInt($bb->getPosition()) + $bb->getPosition(), $bb);
+    }
+
+    /**
+     * @param ByteBuffer $bb
+     * @return Universe
+     */
+    public static function getSizePrefixedRootAsUniverse(ByteBuffer $bb)
+    {
+        $obj = new Universe();
+        $bb->setPosition($bb->getPosition() + Constants::SIZEOF_INT);
+        return $obj->init($bb->getInt($bb->getPosition()) + $bb->getPosition(), $bb);
     }
 
     /**
@@ -42,7 +54,7 @@ class Universe extends Table
     }
 
     /**
-     * @returnVectorOffset
+     * @return VectorOffset
      */
     public function getGalaxies($j)
     {
@@ -139,5 +151,10 @@ class Universe extends Table
     public static function finishUniverseBuffer(FlatBufferBuilder $builder, $offset)
     {
         $builder->finish($offset);
+    }
+
+    public static function finishSizePrefixedUniverseBuffer(FlatBufferBuilder $builder, $offset)
+    {
+        $builder->finish($offset, null, true);
     }
 }

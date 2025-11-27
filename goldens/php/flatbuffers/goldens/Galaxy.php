@@ -7,6 +7,7 @@ use \Google\FlatBuffers\Struct;
 use \Google\FlatBuffers\Table;
 use \Google\FlatBuffers\ByteBuffer;
 use \Google\FlatBuffers\FlatBufferBuilder;
+use \Google\FlatBuffers\Constants;
 
 class Galaxy extends Table
 {
@@ -17,7 +18,18 @@ class Galaxy extends Table
     public static function getRootAsGalaxy(ByteBuffer $bb)
     {
         $obj = new Galaxy();
-        return ($obj->init($bb->getInt($bb->getPosition()) + $bb->getPosition(), $bb));
+        return $obj->init($bb->getInt($bb->getPosition()) + $bb->getPosition(), $bb);
+    }
+
+    /**
+     * @param ByteBuffer $bb
+     * @return Galaxy
+     */
+    public static function getSizePrefixedRootAsGalaxy(ByteBuffer $bb)
+    {
+        $obj = new Galaxy();
+        $bb->setPosition($bb->getPosition() + Constants::SIZEOF_INT);
+        return $obj->init($bb->getInt($bb->getPosition()) + $bb->getPosition(), $bb);
     }
 
     /**
